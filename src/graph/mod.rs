@@ -74,24 +74,20 @@ impl KnowledgeGraph {}
 /// Display trait implementation for KnowledgeGraph
 impl fmt::Display for KnowledgeGraph {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "{}", format!("KnowledgeGraph<{}>", self.name))
+    write!(f, "KnowledgeGraph<{}>", self.name)
   }
 }
 
 /// Display trait implementation for Vertex
 impl fmt::Display for Vertex {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "{}", format!("Vertex<{}, {}>", self.label, self.schema))
+    write!(f, "Vertex<{}, {}>", self.label, self.schema)
   }
 }
 
 /// Display trait implementation for Edge
 impl fmt::Display for Edge {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(
-      f,
-      "{}",
-      format!("Edge<{}, {}>", self.vertex_id, self.predicate)
-    )
+    write!(f, "Edge<{}, {}>", self.vertex_id, self.predicate)
   }
 }
