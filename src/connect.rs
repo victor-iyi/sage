@@ -1,6 +1,6 @@
 use std::env;
 
-use dotenv;
+use dotenv::dotenv;
 use diesel::prelude::*;
 
 /// Establishes an postgres connection.
@@ -11,7 +11,7 @@ use diesel::prelude::*;
 /// let conn: PgConnection = establish_connection();
 /// ```
 pub fn establish_connection() -> PgConnection {
-  dotenv.ok();
+  dotenv().ok();
 
   let database_url: String = env::var("DATABASE_URL")
     .expect("DATABASE_URL must be set.");

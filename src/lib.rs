@@ -8,3 +8,4 @@ extern crate dotenv;
 extern crate serde_json;
 
 pub mod graph;
+pub mod connect;
