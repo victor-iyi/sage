@@ -1,16 +1,21 @@
-#[macro_use]
-pub mod models;
+use std::env;
 
+use dotenv;
 use diesel::prelude::*;
 
-/// Establishes an SQLite connection.
+/// Establishes an postgres connection.
 ///
 /// # Example
 /// ```
 /// #[allow(unused_variable)]
-/// let conn: SqliteConnection = establish_connection("post.db");
+/// let conn: PgConnection = establish_connection();
 /// ```
-pub fn establish_connection(database_url: &str) -> SqliteConnection {
-    SqliteConnection::establish(database_url)
+pub fn establish_connection() -> PgConnection {
+  dotenv.ok();
+
+  let database_url: String = env::var("DATABASE_URL")
+    .expect("DATABASE_URL must be set.");
+
+  PgConnection::establish(&database_url)
     .expect(&format!("Error connecting to {}", database_url))
 }
