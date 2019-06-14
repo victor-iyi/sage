@@ -1,24 +1,14 @@
-
-extern crate diesel;
-extern crate dotenv;
 extern crate sage;
 
-use diesel::prelude::*;
-use dotenv::dotenv;
 use sage::models::graph::{Graph, NewGraph};
-
-use std::env;
+use sage::utils::{input, establish_connection};
 
 fn main() {
-  dotenv().ok();
-
-  let database_url: String = env::var("DATABASE_URL").expect("Make sure DATABASE_URL is set");
-  let conn =
-    PgConnection::establish(&database_url).expect("Could not establish database connection.");
+  let conn = establish_connection();
 
   let g = NewGraph {
-    name: String::from("New York"),
-    description: String::from("Information about the state of New York."),
+    name: input("Enter name of graph: ").expect("Could not read graph name."),
+    description: input("Enter description of graph: ").expect("Could not read description."),
   };
 
   if Graph::insert(&conn, g) {
