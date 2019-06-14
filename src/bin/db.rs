@@ -5,7 +5,7 @@ extern crate sage;
 
 use diesel::prelude::*;
 use dotenv::dotenv;
-use sage::models::{Graph, NewGraph};
+use sage::models::graph::{Graph, NewGraph};
 
 use std::env;
 

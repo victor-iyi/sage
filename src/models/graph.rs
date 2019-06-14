@@ -1,5 +1,3 @@
-#![allow(unused_imports, dead_code, unused_variables)]
-
 use diesel::prelude::*;
 
 use crate::schema::graph;
