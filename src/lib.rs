@@ -6,6 +6,7 @@ extern crate diesel;
 extern crate log;
 extern crate dotenv;
 extern crate serde_json;
+extern crate uuid;
 
-pub mod graph;
-pub mod connect;
+pub mod models;
+pub mod schema;
