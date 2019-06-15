@@ -3,10 +3,17 @@ use diesel::prelude::*;
 use crate::schema::graph;
 use crate::schema::graph::dsl::graph as all_graph;
 
-#[derive(Identifiable, Queryable, PartialEq, Debug)]
+#[derive(Identifiable, Queryable, PartialEq, Clone, Debug)]
 #[table_name = "graph"]
 pub struct Graph {
     pub id: String,
+    pub name: String,
+    pub description: String,
+}
+
+#[derive(Insertable, Clone, Debug)]
+#[table_name = "graph"]
+pub struct NewGraph {
     pub name: String,
     pub description: String,
 }
@@ -46,4 +53,16 @@ impl Graph {
     //     vec![]
     //   }
     // }
+
+    pub fn insert(g: NewGraph, conn: &PgConnection) -> bool {
+        match Graph::get_by_name(&g.name, conn) {
+            Some(_) => false, // Graph name already taken.
+            None => {
+                diesel::insert_into(graph::table)
+                    .values(g)
+                    .execute(conn)
+                    .is_ok()
+            }
+        }
+    }
 }

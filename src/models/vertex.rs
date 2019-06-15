@@ -6,11 +6,19 @@ use crate::schema::vertex::dsl::vertex as all_vertices;
 
 use super::graph::Graph;
 
-#[derive(Identifiable, Queryable, PartialEq, Debug)]
+#[derive(Identifiable, Queryable, PartialEq, Clone, Debug)]
 // #[belongs_to(Graph, foreign_key = "graph_id")]
 #[table_name = "vertex"]
 pub struct Vertex {
     pub id: String,
+    pub label: String,
+    pub schema: String,
+    pub graph_id: String,
+}
+
+#[derive(Insertable, Clone, Debug)]
+#[table_name = "vertex"]
+pub struct NewVertex {
     pub label: String,
     pub schema: String,
     pub graph_id: String,
