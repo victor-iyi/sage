@@ -38,7 +38,7 @@ impl Graph {
         Some(
             all_graph
                 .filter(graph::name.eq(name))
-                .first::<Graph>(conn)
+                .first::<Graph>(conn) // TODO: Implement some kind of optional.
                 .expect(&format!("Could not find graph with name: {}", name)),
         )
     }
