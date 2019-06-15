@@ -40,7 +40,7 @@ pub fn input(msg: &str) -> io::Result<String> {
 ///
 /// ## Basic Usage
 /// ```rust
-/// // Establishc database connection.
+/// // Establish database connection.
 /// let conn = establish_connection();
 /// // Use database connection to query database.
 /// let all_graphs = sage::models::Graph::all(&conn);
