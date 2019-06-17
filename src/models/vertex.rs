@@ -32,21 +32,22 @@ impl Vertex {
     }
 
     pub fn get_by_id(id: &String, conn: &PgConnection) -> Option<Vertex> {
-        Some(
-            all_vertices
-                .find(id)
-                .first::<Vertex>(conn)
-                .expect(&format!("Error loading vertex with id: {}", id)),
-        )
+        let result = all_vertices.find(id).first::<Vertex>(conn);
+        match result {
+            Ok(v) => Some(v),
+            Err(_) => None, // Could not find item.
+        }
     }
 
     pub fn get_by_label(label: &String, schema: &String, conn: &PgConnection) -> Option<Vertex> {
-        Some(
-            all_vertices
-                .filter(vertex::label.eq(label))
-                .filter(vertex::schema.eq(schema))
-                .first::<Vertex>(conn)
-                .expect(&format!("Could not find vertex with name: {}", label)),
-        )
+        let result = all_vertices
+            .filter(vertex::label.eq(label))
+            .filter(vertex::schema.eq(schema))
+            .first::<Vertex>(conn);
+
+        match result {
+            Ok(v) => Some(v),
+            Err(_) => None,
+        }
     }
 }

@@ -26,21 +26,20 @@ impl Graph {
     }
 
     pub fn get_by_id(id: &String, conn: &PgConnection) -> Option<Graph> {
-        Some(
-            all_graph
-                .find(id)
-                .first::<Graph>(conn)
-                .expect(&format!("Error loading graph with id: {}", id)),
-        )
+        let result = all_graph.find(id).first::<Graph>(conn);
+
+        match result {
+            Ok(g) => Some(g),
+            Err(_) => None, // Could not find item in graph.
+        }
     }
 
     pub fn get_by_name(name: &String, conn: &PgConnection) -> Option<Graph> {
-        Some(
-            all_graph
-                .filter(graph::name.eq(name))
-                .first::<Graph>(conn) // TODO: Implement some kind of optional.
-                .expect(&format!("Could not find graph with name: {}", name)),
-        )
+        let result = all_graph.filter(graph::name.eq(name)).first::<Graph>(conn);
+        match result {
+            Ok(g) => Some(g),
+            Err(_) => None,
+        }
     }
 
     // pub fn get_vertices(name: &String, conn: &PgConnection) -> Vec<Graph> {
@@ -57,12 +56,10 @@ impl Graph {
     pub fn insert(g: NewGraph, conn: &PgConnection) -> bool {
         match Graph::get_by_name(&g.name, conn) {
             Some(_) => false, // Graph name already taken.
-            None => {
-                diesel::insert_into(graph::table)
-                    .values(g)
-                    .execute(conn)
-                    .is_ok()
-            }
+            None => diesel::insert_into(graph::table)
+                .values(g)
+                .execute(conn)
+                .is_ok(),
         }
     }
 }
