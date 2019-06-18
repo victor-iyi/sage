@@ -52,8 +52,6 @@ pub fn establish_connection() -> PgConnection {
 
     let database_url: String = env::var("DATABASE_URL").expect("Make sure DATABASE_URL is set.");
 
-    PgConnection::establish(&database_url).expect(&format!(
-        "Could not establish connection to {}.",
-        database_url
-    ))
+    PgConnection::establish(&database_url)
+        .unwrap_or_else(|_| panic!("Could not establish connection to {}.", database_url))
 }

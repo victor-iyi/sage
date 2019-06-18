@@ -25,7 +25,7 @@ impl Graph {
             .expect("Error loading graphs.")
     }
 
-    pub fn get_by_id(id: &String, conn: &PgConnection) -> Option<Graph> {
+    pub fn get_by_id(id: &str, conn: &PgConnection) -> Option<Graph> {
         let result = all_graph.find(id).first::<Graph>(conn);
 
         match result {
@@ -34,7 +34,7 @@ impl Graph {
         }
     }
 
-    pub fn get_by_name(name: &String, conn: &PgConnection) -> Option<Graph> {
+    pub fn get_by_name(name: &str, conn: &PgConnection) -> Option<Graph> {
         let result = all_graph.filter(graph::name.eq(name)).first::<Graph>(conn);
         match result {
             Ok(g) => Some(g),
@@ -42,7 +42,7 @@ impl Graph {
         }
     }
 
-    // pub fn get_vertices(name: &String, conn: &PgConnection) -> Vec<Graph> {
+    // pub fn get_vertices(name: &str, conn: &PgConnection) -> Vec<Graph> {
     //   use super::vertex;
     //   if let Some(g) = Graph::get_by_name(name, conn) {
     //     vertex::Vertex::belonging_to(&g)

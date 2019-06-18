@@ -31,7 +31,7 @@ impl Vertex {
             .expect("Error loading vertices.")
     }
 
-    pub fn get_by_id(id: &String, conn: &PgConnection) -> Option<Vertex> {
+    pub fn get_by_id(id: &str, conn: &PgConnection) -> Option<Vertex> {
         let result = all_vertices.find(id).first::<Vertex>(conn);
         match result {
             Ok(v) => Some(v),
@@ -39,7 +39,7 @@ impl Vertex {
         }
     }
 
-    pub fn get_by_label(label: &String, schema: &String, conn: &PgConnection) -> Option<Vertex> {
+    pub fn get_by_label(label: &str, schema: &str, conn: &PgConnection) -> Option<Vertex> {
         let result = all_vertices
             .filter(vertex::label.eq(label))
             .filter(vertex::schema.eq(schema))

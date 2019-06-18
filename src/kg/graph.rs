@@ -46,7 +46,7 @@ pub struct MultiKnowledgeGraph {
 // MultiKnowledgeGraph methods.
 impl MultiKnowledgeGraph {
 
-  pub fn add_graph(&mut self, name: &String, description: &String) -> Result<bool, SageError> {
+  pub fn add_graph(&mut self, name: &str, description: &str) -> Result<bool, SageError> {
     unimplemented!()
   }
 
