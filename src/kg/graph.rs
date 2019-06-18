@@ -6,7 +6,8 @@ use std::path::Path;
 
 use serde_json::Value;
 
-use crate::error::SageError;
+//use crate::error::SageError;
+use error::SageError;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Edge {
