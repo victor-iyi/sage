@@ -6,35 +6,24 @@ use std::path::Path;
 
 use serde_json::Value;
 
-//use crate::error::SageError;
-use error::SageError;
+use crate::error::SageError;
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct Edge {
-  pub vertex: Vertex, // TODO: Might not be useful.
-  pub predicate: String,
-  pub dest: Vertex,
-}
+use super::schema::{Edge, Graph, Vertex};
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct Vertex {
-  pub label: String,
-  pub schema: String,
-  pub payload: HashMap<String, String>,
-  pub edges: Vec<Edge>,
-}
-
-#[derive(Debug)]
-pub struct Graph {
-  pub name: String,
-  pub description: String,
-  pub vertices: Vec<Vertex>,
-}
 
 #[derive(Debug)]
 pub struct KnowledgeGraph {
   pub name: String,
   pub description: String,
+}
+
+impl KnowledgeGraph {
+  pub fn new(name: &str, description: &str) -> KnowledgeGraph {
+    KnowledgeGraph {
+      name: name.to_owned(),
+      description: description.to_owned(),
+    }
+  }
 }
 
 #[derive(Debug)]
@@ -44,9 +33,9 @@ pub struct MultiKnowledgeGraph {
   pub graphs: Vec<Graph>,
 }
 
+
 // MultiKnowledgeGraph methods.
 impl MultiKnowledgeGraph {
-
   pub fn add_graph(&mut self, name: &str, description: &str) -> Result<bool, SageError> {
     unimplemented!()
   }
@@ -55,6 +44,14 @@ impl MultiKnowledgeGraph {
 
 // MultiKnowledgeGraph related functions.
 impl MultiKnowledgeGraph {
+
+  pub fn new(name: &str, description: &str) -> MultiKnowledgeGraph {
+    MultiKnowledgeGraph {
+      name: name.to_owned(),
+      description: description.to_owned(),
+      graphs: vec![],
+    }
+  }
 
   pub fn from_jsonld(path: impl AsRef<Path>) -> Result<MultiKnowledgeGraph, SageError> {
     unimplemented!()
@@ -65,49 +62,6 @@ impl MultiKnowledgeGraph {
   }
 
 }
-
-// Graph methods.
-impl Graph {
-
-  pub fn add_vertex(&mut self, label: &str, schema: &str) -> Result<bool, SageError> {
-    unimplemented!()
-  }
-
-  pub fn add_payload(&mut self, key: &str, value: &str) -> Result<bool, SageError> {
-    unimplemented!()
-  }
-
-  pub fn load(&mut self, data: Value) {
-    unimplemented!()
-  }
-
-}
-
-
-// Graph related functions.
-impl Graph {
-
-  pub fn new(name: &str, description: &str) -> Graph {
-    unimplemented!()
-  }
-
-  pub fn with_data(name: &str, description: &str, data: Value) -> Graph {
-    unimplemented!()
-  }
-
-  pub fn from(description: &str, data_file: impl AsRef<Path>) -> Graph {
-    unimplemented!()
-  }
-
-}
-
-/*
- * +----------------------------------------------------------------------+
- * | +------------------------------------------------------------------+ |
- * | |                          Display Traits                          + |
- * | +------------------------------------------------------------------+ |
- * +----------------------------------------------------------------------+
- */
 
 impl fmt::Display for KnowledgeGraph {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -121,20 +75,3 @@ impl fmt::Display for MultiKnowledgeGraph {
   }
 }
 
-impl fmt::Display for Graph {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "Graph<{}>", self.name)
-  }
-}
-
-impl fmt::Display for Vertex {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "Vertex<{}, {}>", self.label, self.schema)
-  }
-}
-
-impl fmt::Display for Edge {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "Edge<{}, {}>", self.vertex, self.dest)
-  }
-}

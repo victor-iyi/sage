@@ -57,7 +57,7 @@ impl Graph {
         match Graph::get_by_name(&g.name, conn) {
             Some(_) => false, // Graph name already taken.
             None => diesel::insert_into(graph::table)
-                .values(g)
+                .values(&g)
                 .execute(conn)
                 .is_ok(),
         }
