@@ -10,25 +10,54 @@ use serde_json::Value;
 
 use crate::error::SageError;
 
-
+/// Edge describes the connection between a vertex and it's neighbors.
+///
+/// ```rust
+/// james = Vertex::new("James Cameron", "Person");
+/// avatar = Vertex::new("Avatar", "Movie");
+/// // James ---director--> Avatar
+/// let edge = Edge::new(&james, "director", &avatar);
+///```
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Edge {
+
+  /// Source Vertex has a directed connection to `dest` vertex.
   pub src: Vertex, // TODO: Might not be useful.
+
+  /// Describes the connection `src` vertex has with `dest` vertex.
   pub predicate: String,
+
+  /// Vertex which edge is connected to.
   pub dest: Vertex,
 }
 
 impl Edge {
 
-  pub fn new(src: Vertex, predicate: &str, dest: Vertex) -> Edge {
+  /// Creates a new edge connection between 2 vertices.
+  ///
+  /// ## Example
+  /// ```rust
+  /// let james = Vertex::new("James Cameron", "Person");
+  /// let avatar = Vertex::new("Avatar", "Movie");
+  /// // James --director--> Avatar
+  /// let edge = Edge::new(&james, "director", &avatar);
+  /// ```
+  pub fn new(src: &Vertex, predicate: &str, dest: &Vertex) -> Edge {
     Edge {
-      src,
+      src: src.clone(),
       predicate: predicate.to_owned(),
-      dest,
+      dest: dest.clone(),
     }
   }
 }
 
+/// Vertex (or Node) is a representation of each entity in the Graph.
+///
+/// ## Example
+/// Creates new entity called `James Cameron` of type <https://schema.org/Person>.
+/// ```rust
+/// let james = Vertex::new("James Cameron", "Person");
+/// ```
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Vertex {
   pub label: String,
@@ -38,6 +67,21 @@ pub struct Vertex {
 }
 
 impl Vertex {
+
+  /// Creates a new Vertex object from label and schema.
+  ///
+  ///  Vertices are created with empty payload and edges.
+  ///
+  /// ## Example
+  /// Creates a new entity called `James Cameron` of type <https://schema.org/Person>
+  /// ```rust
+  /// let james = Vertex::new("James Cameron", "Person");
+  /// ```
+  ///
+  /// Creates a new entity called `Avatar` of type <https://schema.org/Movie>
+  /// ```rust
+  /// let avatar = Vertex::new("Avatar", "Movie");
+  /// ```
   pub fn new(label: &str, schema: &str) -> Vertex {
     Vertex {
       label: label.to_owned(),
@@ -46,10 +90,24 @@ impl Vertex {
       edges: vec![],
     }
   }
+
 }
 
 impl Vertex {
 
+  /// Adds a new payload to the vertex.
+  ///
+  /// If `key` already exist, it is overridden by the new `value`.
+  ///
+  /// ## Example
+  /// ```rust
+  /// // Creates a new vertex.
+  /// let avatar = Vertex::new("Avatar", "Movie");
+  /// // Adds `genre` to the vertex's payload.
+  /// avatar.add_payload("genre", "Science Fiction");
+  /// // Adds `trailer` to the vertex's payload.
+  /// avatar.add_payload("trailer", "https://www.youtube.com/watch?v=6ziBFh3V1aM");
+  /// ```
   pub fn add_payload(&mut self, key: &str, value: &str) {
     self
       .payload
@@ -57,9 +115,19 @@ impl Vertex {
       .expect("Could insert payload.");
   }
 
-  pub fn add_edges(&mut self, predicate: &str, dest: &Vertex)  {
+  /// Adds new connection to current vertex object.
+  ///
+  /// ## Example
+  /// `James Cameron` directed the movie `Avatar`, can be represented as:
+  /// ```rust
+  /// let mut james = Vertex::new("James Cameron", "Person");
+  /// let avatar = Vertex::new("Avatar", "Movie");
+  /// // Connects `avatar` to `james` as "director".
+  /// james.add_edge("director", &avatar);
+  /// ```
+  pub fn add_edge(&mut self, predicate: &str, dest: &Vertex) {
     // Create a new edge.
-    let edge = Edge::new(self.clone(), predicate, dest.clone());
+    let edge = Edge::new(&self, predicate, &dest);
 
     // If edge does not exist, add it.
     if !self.edges.contains(&edge) {
@@ -76,9 +144,16 @@ pub struct Graph {
 }
 
 
-// Graph related functions.
+/// Graph related functions.
 impl Graph {
 
+  /// Creates an empty Graph with a name and description.
+  ///
+  /// ## Basic Usage
+  /// ```rust
+  /// // Creates an empty graph.
+  /// let g = Graph::new("Hollywood", "Stores everything related to Hollywood.");
+  /// ```
   pub fn new(name: &str, description: &str) -> Graph {
     Graph {
       name: name.to_owned(),
@@ -87,6 +162,22 @@ impl Graph {
     }
   }
 
+  /// Creates a new graph, populating it with loaded data from `data_file`.
+  /// name is inferred from the filename of `data_file`.
+  ///
+  /// **Note:** `data_file` must be of supported formats.
+  ///   See `sage::kg::SUPPORTED_FORMATS`.
+  ///
+  /// **P.S:** `name` can be updated by resetting the `name` property.
+  ///
+  /// ## Example
+  /// ```rust
+  /// // Create a new mutable graph.
+  /// let mut g = Graph::from_file("Stores everything related to Hollywood",
+  ///                              "resources/schema-org/movie.jsonld");
+  /// // Override the inferred graph name.
+  /// g.name = "Hollywood";
+  /// ```
   pub fn from_file(description: &str, data_file: impl AsRef<Path>) -> Result<Graph, SageError> {
     // name = filename of data_file.
     let splits: Vec<&str> = data_file.as_ref().to_str().unwrap().split('.').collect();
@@ -104,6 +195,12 @@ impl Graph {
     Graph::from_data(name, description, data)
   }
 
+  /// Creates a new graph, and loading it with initial data.
+  ///
+  /// ## Example
+  /// ```rust
+  ///
+  /// ```
   pub fn from_data(name: &str, description: &str, data: Value) -> Result<Graph, SageError> {
     unimplemented!()
   }
@@ -113,6 +210,20 @@ impl Graph {
 // Graph methods.
 impl Graph {
 
+  /// Creates and pushes a new vertex unto the Graph.
+  ///
+  /// ## Example
+  ///
+  /// ```rust
+  /// // Create an empty Graph.
+  /// let g = Graph::new("Hollywood", "Stores everything related to Hollywood.");
+  /// // Create and add the 1st vertex.
+  /// g.add_vertex("James Cameron", "Person");
+  /// // Create and add the 2nd vertex.
+  /// g.add_vertex("Johnny Depp", "Person");
+  /// // Assert the vertices where pushed successfully.
+  /// assert_eq!(g.vertices.len(), 2);
+  /// ```
   pub fn add_vertex(&mut self, label: &str, schema: &str) {
     let vertex = Vertex::new(label, schema);
     self.vertices.push(vertex);
