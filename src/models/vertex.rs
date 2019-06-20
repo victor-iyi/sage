@@ -1,10 +1,36 @@
 use diesel::associations::*;
 use diesel::prelude::*;
+use uuid::Uuid;
 
 use crate::schema::vertex;
 use crate::schema::vertex::dsl::vertex as all_vertices;
 
 use super::graph::Graph;
+
+
+#[derive(Insertable, Clone, Debug)]
+#[table_name = "vertex"]
+pub struct NewVertex {
+    pub id: String,
+    pub label: String,
+    pub schema: String,
+    pub graph_id: String,
+}
+
+impl NewVertex {
+
+    pub fn new(label: &str, schema: &str, graph_id: &str) -> NewVertex {
+        let id: Uuid = Uuid::new_v4();
+        NewVertex {
+            id: id.to_simple().to_string(),
+            label: label.to_owned(),
+            schema: schema.to_owned(),
+            graph_id: graph_id.to_owned(),
+        }
+    }
+
+}
+
 
 #[derive(Identifiable, Queryable, PartialEq, Clone, Debug)]
 // #[belongs_to(Graph, foreign_key = "graph_id")]
@@ -16,13 +42,6 @@ pub struct Vertex {
     pub graph_id: String,
 }
 
-#[derive(Insertable, Clone, Debug)]
-#[table_name = "vertex"]
-pub struct NewVertex {
-    pub label: String,
-    pub schema: String,
-    pub graph_id: String,
-}
 
 impl Vertex {
     pub fn all(conn: &PgConnection) -> Vec<Vertex> {
