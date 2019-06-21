@@ -6,7 +6,7 @@ use std::path::Path;
 
 use serde_json::Value;
 
-use crate::error::SageError;
+use crate::error;
 
 use super::schema::{Edge, Graph, Vertex};
 
@@ -36,7 +36,7 @@ pub struct MultiKnowledgeGraph {
 
 // MultiKnowledgeGraph methods.
 impl MultiKnowledgeGraph {
-  pub fn add_graph(&mut self, name: &str, description: &str) -> Result<bool, SageError> {
+  pub fn add_graph(&mut self, name: &str, description: &str) -> error::Result<bool> {
     unimplemented!()
   }
 
@@ -53,11 +53,11 @@ impl MultiKnowledgeGraph {
     }
   }
 
-  pub fn from_jsonld(path: impl AsRef<Path>) -> Result<MultiKnowledgeGraph, SageError> {
+  pub fn from_jsonld(path: impl AsRef<Path>) -> error::Result<MultiKnowledgeGraph> {
     unimplemented!()
   }
 
-  pub fn from_triples(path: impl AsRef<Path>) -> Result<MultiKnowledgeGraph, SageError> {
+  pub fn from_triples(path: impl AsRef<Path>) -> error::Result<MultiKnowledgeGraph> {
     unimplemented!()
   }
 

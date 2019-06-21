@@ -21,12 +21,14 @@ use crate::error::SageError;
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Edge {
 
+  // TODO: Might wanna use a Box<Vertex> to reduce size.
   /// Source Vertex has a directed connection to `dest` vertex.
-  pub src: Vertex, // TODO: Might not be useful.
+  pub src: Vertex,
 
   /// Describes the connection `src` vertex has with `dest` vertex.
   pub predicate: String,
 
+  // TODO: Might wanna use a Box<Vertex> to reduce size.
   /// Vertex which edge is connected to.
   pub dest: Vertex,
 }
