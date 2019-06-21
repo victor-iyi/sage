@@ -36,9 +36,14 @@ impl NewVertex {
 // #[belongs_to(Graph, foreign_key = "graph_id")]
 #[table_name = "vertex"]
 pub struct Vertex {
+    /// Unique Vertex identifier.
     pub id: String,
+    /// Vertex label.
     pub label: String,
+    /// Vertex schema. Must be a descendant of <https://schema.org/Thing>
+    /// or RDF or WikiData property.
     pub schema: String,
+    /// Graph ID associated to this vertex.
     pub graph_id: String,
 }
 
@@ -67,6 +72,16 @@ impl Vertex {
         match result {
             Ok(v) => Some(v),
             Err(_) => None,
+        }
+    }
+
+    pub fn insert(v: NewVertex, conn: &PgConnection) -> bool {
+        match Vertex::get_by_label(&v.label, &v.schema, conn) {
+            Some(_) => false,
+            None => diesel::insert_into(vertex::table)
+                .values(&v)
+                .execute(conn)
+                .is_ok(),
         }
     }
 }

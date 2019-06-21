@@ -14,5 +14,12 @@ pub fn from_jsonld(path: impl AsRef<Path>) -> Value {
 
   // Read the JSON contents as an instance of `serde_json::Value`.
   let content: Value = serde_json::from_reader(reader).expect("Could not parse JSON data.");
+  if content.is_object() {
+    // We can iterate over map.
+    let _map = content.as_object().unwrap();
+  } else if content.is_array() {
+    let _arr = content.as_array().unwrap();
+  }
+
   content
 }
