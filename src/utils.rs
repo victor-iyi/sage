@@ -1,8 +1,12 @@
+//! `sage.utils` contains useful helper functions either during using
+//! `sage` or by your program (which may or may not have anything to
+//! do with `sage`).
 use diesel::prelude::*;
 use dotenv::dotenv;
 
 use std::env;
 use std::io;
+
 /// Getting input from stdin. Masking Python's `input` function.
 ///
 /// ## Basic Usage.
@@ -52,8 +56,6 @@ pub fn establish_connection() -> PgConnection {
 
     let database_url: String = env::var("DATABASE_URL").expect("Make sure DATABASE_URL is set.");
 
-    PgConnection::establish(&database_url).expect(&format!(
-        "Could not establish connection to {}.",
-        database_url
-    ))
+    PgConnection::establish(&database_url)
+        .unwrap_or_else(|_| panic!("Could not establish connection to {}.", database_url))
 }
