@@ -3,6 +3,10 @@
 **/*.rs.bk
 Cargo.lock
 
+### Development
+.idea
+.vscode
+
 ### Project template
 .env
 migrations
