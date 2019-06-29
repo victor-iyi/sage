@@ -1,6 +1,8 @@
 //! `sage.utils` contains useful helper functions either during using
 //! `sage` or by your program (which may or may not have anything to
 //! do with `sage`).
+#![allow(dead_code)]
+
 use diesel::prelude::*;
 use dotenv::dotenv;
 

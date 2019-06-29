@@ -8,8 +8,10 @@ extern crate dotenv;
 extern crate serde_json;
 extern crate uuid;
 
-pub mod kg;
-pub mod models;
-pub mod schema;
-pub mod utils;
+
+mod models;
+mod schema;
+mod utils;
+
 pub mod error;
+pub mod kg;
