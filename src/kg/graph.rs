@@ -1,4 +1,4 @@
-#![allow(unused_variables, unused_imports)]
+#![allow(unused_variables)]
 
 // Standard library.
 use std::collections::HashMap;

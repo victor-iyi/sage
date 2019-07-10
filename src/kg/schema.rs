@@ -8,7 +8,7 @@ use std::path::Path;
 
 use serde_json::Value;
 
-use crate::error::SageError;
+use crate::error;
 
 /// Edge describes the connection between a vertex and it's neighbors.
 ///
@@ -180,7 +180,7 @@ impl Graph {
   /// // Override the inferred graph name.
   /// g.name = "Hollywood";
   /// ```
-  pub fn from_file(description: &str, data_file: impl AsRef<Path>) -> Result<Graph, SageError> {
+  pub fn from_file(description: &str, data_file: impl AsRef<Path>) -> error::Result<Graph> {
     // name = filename of data_file.
     let splits: Vec<&str> = data_file.as_ref().to_str().unwrap().split('.').collect();
     let name = *(splits.get(splits.len() - 2).unwrap());
@@ -203,7 +203,7 @@ impl Graph {
   /// ```rust
   ///
   /// ```
-  pub fn from_data(name: &str, description: &str, data: Value) -> Result<Graph, SageError> {
+  pub fn from_data(name: &str, description: &str, data: Value) -> error::Result<Graph> {
     unimplemented!()
   }
 
