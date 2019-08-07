@@ -8,7 +8,7 @@ use std::path::Path;
 
 use serde_json::Value;
 
-use crate::error;
+use crate::SageResult;
 
 /// Edge describes the connection between a vertex and it's neighbors.
 ///
@@ -47,7 +47,7 @@ impl Edge {
   pub fn new(src: &Vertex, predicate: &str, dest: &Vertex) -> Edge {
     Edge {
       src: src.clone(),
-      predicate: predicate.to_owned(),
+      predicate: predicate.to_string(),
       dest: dest.clone(),
     }
   }
@@ -86,8 +86,8 @@ impl Vertex {
   /// ```
   pub fn new(label: &str, schema: &str) -> Vertex {
     Vertex {
-      label: label.to_owned(),
-      schema: schema.to_owned(),
+      label: label.to_string(),
+      schema: schema.to_string(),
       payload: HashMap::new(),
       edges: vec![],
     }
@@ -113,7 +113,7 @@ impl Vertex {
   pub fn add_payload(&mut self, key: &str, value: &str) {
     self
       .payload
-      .insert(key.to_owned(), value.to_owned())
+      .insert(key.to_string(), value.to_string())
       .expect("Could insert payload.");
   }
 
@@ -158,8 +158,8 @@ impl Graph {
   /// ```
   pub fn new(name: &str, description: &str) -> Graph {
     Graph {
-      name: name.to_owned(),
-      description: description.to_owned(),
+      name: name.to_string(),
+      description: description.to_string(),
       vertices: vec![],
     }
   }
@@ -180,7 +180,7 @@ impl Graph {
   /// // Override the inferred graph name.
   /// g.name = "Hollywood";
   /// ```
-  pub fn from_file(description: &str, data_file: impl AsRef<Path>) -> error::Result<Graph> {
+  pub fn from_file(description: &str, data_file: impl AsRef<Path>) -> SageResult<Graph> {
     // name = filename of data_file.
     let splits: Vec<&str> = data_file.as_ref().to_str().unwrap().split('.').collect();
     let name = *(splits.get(splits.len() - 2).unwrap());
@@ -203,7 +203,7 @@ impl Graph {
   /// ```rust
   ///
   /// ```
-  pub fn from_data(name: &str, description: &str, data: Value) -> error::Result<Graph> {
+  pub fn from_data(name: &str, description: &str, data: Value) -> SageResult<Graph> {
     unimplemented!()
   }
 
@@ -265,5 +265,20 @@ impl fmt::Display for Vertex {
 impl fmt::Display for Edge {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "Edge<{}, {}>", self.src, self.dest)
+  }
+}
+
+mod tests {
+
+  use super::*;
+
+  #[test]
+  fn create_vertex() {
+    let schema = String::from("Person");
+    let label = String::from("James Cameron");
+    let vertex: Vertex = Vertex::new(&label, &schema);
+
+    assert_eq!(vertex.label, label);
+    assert_eq!(vertex.schema, schema);
   }
 }

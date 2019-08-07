@@ -9,7 +9,7 @@ use std::path::Path;
 use serde_json::Value;
 
 // Custom crate.
-use crate::error;
+use crate::{error, SageResult};
 use super::schema::{Edge, Graph, Vertex};
 
 
@@ -41,8 +41,8 @@ impl KnowledgeGraph {
   /// ```
   pub fn new(name: &str, description: &str) -> KnowledgeGraph {
     KnowledgeGraph {
-      name: name.to_owned(),
-      description: description.to_owned(),
+      name: name.to_string(),
+      description: description.to_string(),
     }
   }
 
@@ -63,7 +63,7 @@ pub struct MultiKnowledgeGraph {
 impl MultiKnowledgeGraph {
 
   /// Adds a new graph to the Knowledge Graph.
-  pub fn add_graph(&mut self, name: &str, description: &str) -> error::Result<bool> {
+  pub fn add_graph(&mut self, name: &str, description: &str) -> SageResult<bool> {
     unimplemented!()
   }
 
@@ -85,19 +85,19 @@ impl MultiKnowledgeGraph {
   /// ```
   pub fn new(name: &str, description: &str) -> MultiKnowledgeGraph {
     MultiKnowledgeGraph {
-      name: name.to_owned(),
-      description: description.to_owned(),
+      name: name.to_string(),
+      description: description.to_string(),
       graphs: vec![],
     }
   }
 
   /// Load knowledge graph from a JSONLD (.jsonld or .json) file.
-  pub fn from_jsonld(path: impl AsRef<Path>) -> error::Result<MultiKnowledgeGraph> {
+  pub fn from_jsonld(path: impl AsRef<Path>) -> SageResult<MultiKnowledgeGraph> {
     unimplemented!()
   }
 
   /// Load the knowledge graph from an n-triple (.nt) file.
-  pub fn from_triples(path: impl AsRef<Path>) -> error::Result<MultiKnowledgeGraph> {
+  pub fn from_triples(path: impl AsRef<Path>) -> SageResult<MultiKnowledgeGraph> {
     unimplemented!()
   }
 
