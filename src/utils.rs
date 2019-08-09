@@ -8,8 +8,11 @@ use std::io;
 /// Getting input from stdin. Masking Python's `input` function.
 ///
 /// ## Basic Usage.
+///
 /// Getting `String` input from console.
 /// ```
+/// use sage::utils::input;
+///
 /// let name: String = input("Enter your name:")
 ///                     .expect("Failed to get name.");
 /// println!("name = {}", name);
@@ -17,19 +20,25 @@ use std::io;
 ///
 /// Getting other types aside `String`.
 /// ```
-/// let age: u8 = input("Enter your age: ")
+/// use sage::utils::input;
+///
+/// if let Ok(age) = input("Enter your age: ")
 ///                .expect("Failed to get age.")
-///                .parse::<u8>().expect("Invalid age.");
+///                .parse::<u8>() {
+///   println!("age = {}", age);
+/// } else {
+///   eprintln!("Could not parse age.");
+/// }
 /// ```
 pub fn input(msg: &str) -> io::Result<String> {
-    use std::io::Write;
-    // Print prompt to the console.
-    print!("{}", msg);
-    io::stdout().flush()?;
+  use std::io::Write;
+  // Print prompt to the console.
+  print!("{}", msg);
+  io::stdout().flush()?;
 
-    // Accept input.
-    let mut buffer: String = String::new();
-    io::stdin().read_line(&mut buffer)?;
+  // Accept input.
+  let mut buffer: String = String::new();
+  io::stdin().read_line(&mut buffer)?;
 
-    Ok(buffer.trim_end().to_owned())
+  Ok(buffer.trim_end().to_owned())
 }

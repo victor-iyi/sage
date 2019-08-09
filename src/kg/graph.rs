@@ -32,12 +32,14 @@ impl KnowledgeGraph {
   ///
   /// # Example
   /// ```rust
+  /// use sage::kg::KnowledgeGraph;
+  ///
   /// let name = "Hollywood";
   /// let description = "Contains information about hollywood movie industry";
-  ///
-  /// // Create a new knowledge graph.
-  /// let graph = KnowledgeGraph(name, description);
-  /// println!("{}", graph);
+  /// // Create a singly KnowledgeGraph.
+  /// let graph = KnowledgeGraph::new(name, description);
+  /// assert_eq!(graph.name, name.to_string());
+  /// assert_eq!(graph.description, description.to_string());
   /// ```
   pub fn new(name: &str, description: &str) -> KnowledgeGraph {
     KnowledgeGraph {
@@ -76,12 +78,14 @@ impl MultiKnowledgeGraph {
   ///
   /// # Example
   /// ```rust
+  /// use sage::kg::MultiKnowledgeGraph;
+  ///
   /// let name = "Hollywood";
   /// let description = "Contains information about the Hollywood movie industry.";
   ///
   /// // Create a new multiple knowledge graph.
-  /// graph = MultiKnowledgeGraph::new(name, description);
-  /// println!("{}", graph);
+  /// let graph = MultiKnowledgeGraph::new(name, description);
+  /// assert_eq!(format!("MultiKnowledgeGraph<{}>", name), format!("{}", graph));
   /// ```
   pub fn new(name: &str, description: &str) -> MultiKnowledgeGraph {
     MultiKnowledgeGraph {

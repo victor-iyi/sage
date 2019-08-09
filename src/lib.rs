@@ -9,17 +9,17 @@ extern crate uuid;
 
 pub mod error;
 pub mod kg;
+pub mod utils;
 
-mod utils;
 
 /// sage crate `Result` type.
 ///
 /// ## Example
 /// ```
-/// use sage::{error, kg};
+/// use sage::{SageResult, kg};
 ///
 /// /// Attempts to create Knowledge Graph from a file.
-/// fn graph_from_file(path: impl AsRef<str>) -> error::Result<kg::KnowledgeGraph> {
+/// fn graph_from_file(path: impl AsRef<str>) -> SageResult<kg::KnowledgeGraph> {
 ///   unimplemented!()
 /// }
 /// ```
