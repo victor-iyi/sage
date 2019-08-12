@@ -32,16 +32,3 @@ impl From<serde_json::Error> for SageError {
     }
   }
 }
-
-/// sage crate `Result` type.
-///
-/// ## Example
-/// ```
-/// use sage::{error, kg};
-///
-/// /// Attempts to create Knowledge Graph from a file.
-/// fn graph_from_file(path: impl AsRef<str>) -> error::Result<kg::KnowledgeGraph> {
-///   unimplemented!()
-/// }
-/// ```
-pub type Result<T> = std::result::Result<T, SageError>;

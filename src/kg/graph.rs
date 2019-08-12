@@ -9,7 +9,7 @@ use std::path::Path;
 use serde_json::Value;
 
 // Custom crate.
-use crate::error;
+use crate::{error, SageResult};
 use super::schema::{Edge, Graph, Vertex};
 
 
@@ -32,17 +32,19 @@ impl KnowledgeGraph {
   ///
   /// # Example
   /// ```rust
+  /// use sage::kg::KnowledgeGraph;
+  ///
   /// let name = "Hollywood";
   /// let description = "Contains information about hollywood movie industry";
-  ///
-  /// // Create a new knowledge graph.
-  /// let graph = KnowledgeGraph(name, description);
-  /// println!("{}", graph);
+  /// // Create a singly KnowledgeGraph.
+  /// let graph = KnowledgeGraph::new(name, description);
+  /// assert_eq!(graph.name, name.to_string());
+  /// assert_eq!(graph.description, description.to_string());
   /// ```
   pub fn new(name: &str, description: &str) -> KnowledgeGraph {
     KnowledgeGraph {
-      name: name.to_owned(),
-      description: description.to_owned(),
+      name: name.to_string(),
+      description: description.to_string(),
     }
   }
 
@@ -63,7 +65,7 @@ pub struct MultiKnowledgeGraph {
 impl MultiKnowledgeGraph {
 
   /// Adds a new graph to the Knowledge Graph.
-  pub fn add_graph(&mut self, name: &str, description: &str) -> error::Result<bool> {
+  pub fn add_graph(&mut self, name: &str, description: &str) -> SageResult<bool> {
     unimplemented!()
   }
 
@@ -76,28 +78,30 @@ impl MultiKnowledgeGraph {
   ///
   /// # Example
   /// ```rust
+  /// use sage::kg::MultiKnowledgeGraph;
+  ///
   /// let name = "Hollywood";
   /// let description = "Contains information about the Hollywood movie industry.";
   ///
   /// // Create a new multiple knowledge graph.
-  /// graph = MultiKnowledgeGraph::new(name, description);
-  /// println!("{}", graph);
+  /// let graph = MultiKnowledgeGraph::new(name, description);
+  /// assert_eq!(format!("MultiKnowledgeGraph<{}>", name), format!("{}", graph));
   /// ```
   pub fn new(name: &str, description: &str) -> MultiKnowledgeGraph {
     MultiKnowledgeGraph {
-      name: name.to_owned(),
-      description: description.to_owned(),
+      name: name.to_string(),
+      description: description.to_string(),
       graphs: vec![],
     }
   }
 
   /// Load knowledge graph from a JSONLD (.jsonld or .json) file.
-  pub fn from_jsonld(path: impl AsRef<Path>) -> error::Result<MultiKnowledgeGraph> {
+  pub fn from_jsonld(path: impl AsRef<Path>) -> SageResult<MultiKnowledgeGraph> {
     unimplemented!()
   }
 
   /// Load the knowledge graph from an n-triple (.nt) file.
-  pub fn from_triples(path: impl AsRef<Path>) -> error::Result<MultiKnowledgeGraph> {
+  pub fn from_triples(path: impl AsRef<Path>) -> SageResult<MultiKnowledgeGraph> {
     unimplemented!()
   }
 

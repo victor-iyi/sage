@@ -8,13 +8,15 @@ use std::path::Path;
 
 use serde_json::Value;
 
-use crate::error;
+use crate::SageResult;
 
 /// Edge describes the connection between a vertex and it's neighbors.
 ///
 /// ```rust
-/// james = Vertex::new("James Cameron", "Person");
-/// avatar = Vertex::new("Avatar", "Movie");
+/// use sage::kg::{Vertex, Edge};
+///
+/// let james = Vertex::new("James Cameron", "Person");
+/// let avatar = Vertex::new("Avatar", "Movie");
 /// // James ---director--> Avatar
 /// let edge = Edge::new(&james, "director", &avatar);
 ///```
@@ -39,6 +41,8 @@ impl Edge {
   ///
   /// ## Example
   /// ```rust
+  /// use sage::kg::{Vertex, Edge};
+  ///
   /// let james = Vertex::new("James Cameron", "Person");
   /// let avatar = Vertex::new("Avatar", "Movie");
   /// // James --director--> Avatar
@@ -47,7 +51,7 @@ impl Edge {
   pub fn new(src: &Vertex, predicate: &str, dest: &Vertex) -> Edge {
     Edge {
       src: src.clone(),
-      predicate: predicate.to_owned(),
+      predicate: predicate.to_string(),
       dest: dest.clone(),
     }
   }
@@ -58,7 +62,9 @@ impl Edge {
 /// ## Example
 /// Creates new entity called `James Cameron` of type <https://schema.org/Person>.
 /// ```rust
+/// use sage::kg::Vertex;
 /// let james = Vertex::new("James Cameron", "Person");
+/// assert_eq!(format!("Vertex<{}, {}>", "James Cameron", "Person"), format!("{}", james));
 /// ```
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Vertex {
@@ -77,17 +83,25 @@ impl Vertex {
   /// ## Example
   /// Creates a new entity called `James Cameron` of type <https://schema.org/Person>
   /// ```rust
+  /// use sage::kg::Vertex;
+  ///
   /// let james = Vertex::new("James Cameron", "Person");
+  /// assert_eq!(james.label, String::from("James Cameron"));
+  /// assert_eq!(james.schema, String::from("Person"));
   /// ```
   ///
   /// Creates a new entity called `Avatar` of type <https://schema.org/Movie>
   /// ```rust
+  /// use sage::kg::Vertex;
+  ///
   /// let avatar = Vertex::new("Avatar", "Movie");
+  /// assert_eq!(avatar.label, String::from("Avatar"));
+  /// assert_eq!(avatar.schema, String::from("Movie"));
   /// ```
   pub fn new(label: &str, schema: &str) -> Vertex {
     Vertex {
-      label: label.to_owned(),
-      schema: schema.to_owned(),
+      label: label.to_string(),
+      schema: schema.to_string(),
       payload: HashMap::new(),
       edges: vec![],
     }
@@ -103,18 +117,21 @@ impl Vertex {
   ///
   /// ## Example
   /// ```rust
+  /// use sage::kg::Vertex;
   /// // Creates a new vertex.
-  /// let avatar = Vertex::new("Avatar", "Movie");
+  /// let mut avatar = Vertex::new("Avatar", "Movie");
   /// // Adds `genre` to the vertex's payload.
   /// avatar.add_payload("genre", "Science Fiction");
+  /// assert_eq!(avatar.payload.len(), 1);
   /// // Adds `trailer` to the vertex's payload.
   /// avatar.add_payload("trailer", "https://www.youtube.com/watch?v=6ziBFh3V1aM");
+  /// assert_eq!(avatar.payload.len(), 2);
   /// ```
   pub fn add_payload(&mut self, key: &str, value: &str) {
     self
       .payload
-      .insert(key.to_owned(), value.to_owned())
-      .expect("Could insert payload.");
+      .insert(key.to_string(), value.to_string())
+      .unwrap_or_default();
   }
 
   /// Adds new connection to current vertex object.
@@ -122,6 +139,7 @@ impl Vertex {
   /// ## Example
   /// `James Cameron` directed the movie `Avatar`, can be represented as:
   /// ```rust
+  /// use sage::kg::Vertex;
   /// let mut james = Vertex::new("James Cameron", "Person");
   /// let avatar = Vertex::new("Avatar", "Movie");
   /// // Connects `avatar` to `james` as "director".
@@ -153,13 +171,14 @@ impl Graph {
   ///
   /// ## Basic Usage
   /// ```rust
+  /// use sage::kg::Graph;
   /// // Creates an empty graph.
   /// let g = Graph::new("Hollywood", "Stores everything related to Hollywood.");
   /// ```
   pub fn new(name: &str, description: &str) -> Graph {
     Graph {
-      name: name.to_owned(),
-      description: description.to_owned(),
+      name: name.to_string(),
+      description: description.to_string(),
       vertices: vec![],
     }
   }
@@ -174,13 +193,16 @@ impl Graph {
   ///
   /// ## Example
   /// ```rust
+  /// use sage::kg::Graph;
+  ///
   /// // Create a new mutable graph.
   /// let mut g = Graph::from_file("Stores everything related to Hollywood",
-  ///                              "resources/schema-org/movie.jsonld");
+  ///                              "resources/schema-org/movie.jsonld").unwrap();
   /// // Override the inferred graph name.
-  /// g.name = "Hollywood";
+  /// g.name = String::from("Hollywood");
+  /// assert_eq!(g.name, String::from("Hollywood"));
   /// ```
-  pub fn from_file(description: &str, data_file: impl AsRef<Path>) -> error::Result<Graph> {
+  pub fn from_file(description: &str, data_file: impl AsRef<Path>) -> SageResult<Graph> {
     // name = filename of data_file.
     let splits: Vec<&str> = data_file.as_ref().to_str().unwrap().split('.').collect();
     let name = *(splits.get(splits.len() - 2).unwrap());
@@ -201,10 +223,26 @@ impl Graph {
   ///
   /// ## Example
   /// ```rust
+  /// use std::fs::File;
+  /// use std::io::BufReader;
+  /// use serde_json;
+  /// use sage::kg::Graph;
   ///
+  /// let file = File::open("resources/schema-org/movie.jsonld").expect("Could not open file.");
+  /// let reader = BufReader::new(file);
+  ///
+  /// // Read the JSON contents as an instance of `serde_json::Value`.
+  /// let data: serde_json::Value = serde_json::from_reader(reader).expect("Could not parse JSON data.");
+  /// let graph = Graph::from_data("avatar", "James Cameron's avatar", data).unwrap();
+  /// println!("{}", graph);
   /// ```
-  pub fn from_data(name: &str, description: &str, data: Value) -> error::Result<Graph> {
-    unimplemented!()
+  pub fn from_data(name: &str, description: &str, _data: Value) -> SageResult<Graph> {
+    Ok(Graph {
+      name: name.to_string(),
+      description: description.to_string(),
+      // TODO: Populate `vertices` with values from data.
+      vertices: vec![],
+    })
   }
 
 }
@@ -217,8 +255,10 @@ impl Graph {
   /// ## Example
   ///
   /// ```rust
+  /// use sage::kg::Graph;
+  ///
   /// // Create an empty Graph.
-  /// let g = Graph::new("Hollywood", "Stores everything related to Hollywood.");
+  /// let mut g = Graph::new("Hollywood", "Stores everything related to Hollywood.");
   /// // Create and add the 1st vertex.
   /// g.add_vertex("James Cameron", "Person");
   /// // Create and add the 2nd vertex.
@@ -265,5 +305,20 @@ impl fmt::Display for Vertex {
 impl fmt::Display for Edge {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "Edge<{}, {}>", self.src, self.dest)
+  }
+}
+
+mod tests {
+
+  use super::*;
+
+  #[test]
+  fn create_vertex() {
+    let schema = String::from("Person");
+    let label = String::from("James Cameron");
+    let vertex: Vertex = Vertex::new(&label, &schema);
+
+    assert_eq!(vertex.label, label);
+    assert_eq!(vertex.schema, schema);
   }
 }
