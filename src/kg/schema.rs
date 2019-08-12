@@ -223,7 +223,18 @@ impl Graph {
   ///
   /// ## Example
   /// ```rust
+  /// use std::fs::File;
+  /// use std::io::BufReader;
+  /// use serde_json;
+  /// use sage::kg::Graph;
   ///
+  /// let file = File::open("resources/schema-org/movie.jsonld").expect("Could not open file.");
+  /// let reader = BufReader::new(file);
+  ///
+  /// // Read the JSON contents as an instance of `serde_json::Value`.
+  /// let data: serde_json::Value = serde_json::from_reader(reader).expect("Could not parse JSON data.");
+  /// let graph = Graph::from_data("avatar", "James Cameron's avatar", data).unwrap();
+  /// println!("{}", graph);
   /// ```
   pub fn from_data(name: &str, description: &str, _data: Value) -> SageResult<Graph> {
     Ok(Graph {
