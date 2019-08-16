@@ -2,6 +2,30 @@
 
 A Rust implementation of [Sage](https://github.com/victor-iyiola/sage).
 
+Sage is an open source knowledge graph used to represent linked-data. It comprises of varieties of features that makes it stand out amongst other (open source) Knowledge Graphs.
+
+
+## Features / Advantages
+
+- Usage
+  - Easy to get started
+  - Simple & intuitive Query API
+- Features
+  - Built-in visualizer
+  - Multi-schema support
+  - REST / GraphQL API
+  - Command line interface
+- Natural Language Processing
+  - Semantic parser
+  - Graph Neural Network
+  - Graph embedding
+- Bonus
+  - Written in Rust (lightening fast)
+  - Community driven
+  - Multi threaded / non-blocking
+  - Support for Python & JavaScript
+
+
 ## Contribution
 
 You are very welcome to modify and use them in your own projects.
