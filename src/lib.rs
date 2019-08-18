@@ -1,11 +1,12 @@
 #![allow(unused_imports)]
 
+extern crate dotenv;
 #[macro_use]
 extern crate log;
-extern crate dotenv;
+extern crate ntriple;
+extern crate rdf;
 extern crate serde_json;
 extern crate uuid;
-
 
 mod cli;
 mod datastore;
