@@ -8,7 +8,12 @@ extern crate uuid;
 
 
 mod cli;
-pub mod error;
+mod datastore;
+mod error;
+mod processor;
+mod query;
+mod schema;
+
 
 /// sage crate `Result` type.
 pub type SageResult<T> = std::result::Result<T, error::SageError>;

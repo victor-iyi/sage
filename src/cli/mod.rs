@@ -1,10 +1,10 @@
 //! Command line interface module.
 #![allow(dead_code)]
 
-pub struct Cmd {}
+pub struct Argument {}
 
-impl Cmd {
-  pub fn new() -> Result<Cmd, &'static str> {
-    Ok(Cmd {})
+impl Argument {
+  pub fn new() -> Result<Argument, &'static str> {
+    Ok(Argument {})
   }
 }
