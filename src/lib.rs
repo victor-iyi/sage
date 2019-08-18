@@ -1,15 +1,19 @@
 #![allow(unused_imports)]
 
-#[macro_use]
-extern crate diesel;
+extern crate dotenv;
 #[macro_use]
 extern crate log;
-extern crate dotenv;
+extern crate ntriple;
+extern crate rdf;
 extern crate serde_json;
 extern crate uuid;
 
-pub mod kg;
-pub mod models;
-pub mod schema;
-pub mod utils;
-pub mod error;
+mod datastore;
+mod error;
+mod processor;
+mod query;
+mod schema;
+
+
+/// sage crate `Result` type.
+pub type SageResult<T> = std::result::Result<T, error::SageError>;
