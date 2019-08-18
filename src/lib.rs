@@ -8,7 +8,6 @@ extern crate rdf;
 extern crate serde_json;
 extern crate uuid;
 
-mod cli;
 mod datastore;
 mod error;
 mod processor;
