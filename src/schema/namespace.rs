@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use crate::schema::values::IRI;
+use crate::types::IRI;
 
 use std::collections::HashMap;
 

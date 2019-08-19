@@ -19,6 +19,9 @@ pub enum SageError {
 
     /// The error caused during data parsing from one data type to another.
     ParseError,
+
+    /// The error caused by illegal or invalid namespace.
+    IllegalNamespace,
 }
 
 /// Conversion from `serde_json` to `SageError`.
