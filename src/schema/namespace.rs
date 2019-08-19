@@ -63,15 +63,23 @@ impl Namespaces {
   /// `Namespaces::short_IRI` replaces a base IRI of a known vocabulary with it's prefix.
   ///
   ///	short_iri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") // returns "rdf:type"
-  pub fn short_iri(_iri: &IRI) -> &str {
-    unimplemented!()
+  pub fn short_iri<'a>(&'a self, iri: &'a IRI) -> &'a IRI {
+    for (prefix, full) in self.prefixes.iter() {
+      if full == iri {
+        return prefix;
+      }
+    }
+    iri
   }
 
   /// `Namespaces::full_IRI` replaces known prefix in IRI with it's full vocabulary IRI.
   ///
   ///	full_iri("rdf:type") // returns "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-  pub fn full_iri(_iri: &IRI) -> &str {
-    unimplemented!()
+  pub fn full_iri<'a>(&'a self, iri: &'a IRI) -> &'a IRI {
+    match self.prefixes.get(iri) {
+      Some(full) => full,
+      None => iri,
+    }
   }
 
   /// `Namespaces::list` enumerates all registered namespace pairs.
@@ -163,7 +171,33 @@ mod tests {
     ns.add(&rdf);
     ns.add(&schema);
 
-    assert_eq!(vec![schema, rdf], ns.list());
+    assert_eq!(ns.list().len(), 2);
+    assert!(ns.list().contains(&rdf));
+    assert!(ns.list().contains(&schema));
+  }
+
+  #[test]
+  fn short_iri() {
+    let mut ns = Namespaces::new();
+
+    let pref = IRI::from("rdf:type");
+    let full = IRI::from("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+    ns.add_prefix(&pref, &full);
+
+    assert_eq!(ns.short_iri(&full), &pref);
+    assert_eq!(ns.short_iri(&IRI::from("unknown")), &IRI::from("unknown"));
+  }
+
+  #[test]
+  fn full_iri() {
+    let mut ns = Namespaces::new();
+
+    let pref = IRI::from("rdf:type");
+    let full = IRI::from("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+    ns.add_prefix(&pref, &full);
+
+    assert_eq!(ns.full_iri(&pref), &full);
+    assert_eq!(ns.full_iri(&IRI::from("unknown")), &IRI::from("unknown"));
   }
 
 }
