@@ -1,0 +1,4 @@
+enum Node {
+  BlankNode,
+  SchemaNode,
+}

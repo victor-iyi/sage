@@ -3,6 +3,7 @@
 
 mod custom;
 mod jsonld;
-mod ntriple;
+mod namespace;
 mod rdf;
+mod values;
 mod wikidata;
