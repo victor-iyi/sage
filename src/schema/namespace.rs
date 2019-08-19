@@ -162,12 +162,12 @@ impl Namespaces {
   /// );
   /// assert_eq!(ns.list().len(), 1);
   ///
-  ///    // Using IRI reference.
-  ///    ns.add_prefix(
-  ///      &IRI::from("schema:Thing"),
-  ///      &IRI::from("https://schema.org/Thing"),
-  ///    );
-  ///    assert_eq!(ns.list().len(), 2);
+  /// // Using IRI reference.
+  /// ns.add_prefix(
+  ///   &IRI::from("schema:Thing"),
+  ///   &IRI::from("https://schema.org/Thing"),
+  /// );
+  /// assert_eq!(ns.list().len(), 2);
   /// ```
   ///
   pub fn add_prefix(&mut self, prefix: &str, full: &str) {
