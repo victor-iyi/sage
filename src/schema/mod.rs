@@ -3,6 +3,8 @@
 
 mod custom;
 mod jsonld;
-mod ntriple;
+mod namespace;
 mod rdf;
 mod wikidata;
+
+pub use namespace::{Namespace, Namespaces};

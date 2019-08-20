@@ -1,8 +1,6 @@
-# rust-sage
+# Sage
 
-A Rust implementation of [Sage](https://github.com/victor-iyiola/sage).
-
-Sage is an open source knowledge graph used to represent linked-data. It comprises of varieties of features that makes it stand out amongst other (open source) Knowledge Graphs.
+Sage is an open source [Knowledge Graph](https://en.wikipedia.org/wiki/Knowledge_Graph) used to represent linked-data. It comprises of varieties of features that makes it stand out amongst other (open source) Knowledge Graphs.
 
 
 ## Features / Advantages
@@ -23,14 +21,14 @@ Sage is an open source knowledge graph used to represent linked-data. It compris
   - Written in Rust (lightening fast)
   - Community driven
   - Multi threaded / non-blocking
-  - Support for Python & JavaScript
+  - Support for [Python](https://github.com/victor-iyiola/sage-py) & JavaScript
 
 
 ## Contribution
 
 You are very welcome to modify and use them in your own projects.
 
-Please keep a link to the [original repository](https://github.com/victor-iyiola/rust-sage). If you have made a fork with substantial modifications that you feel may be useful, then please [open a new issue on GitHub](https://github.com/victor-iyiola/rust-sage/issues) with a link and short description.
+Please keep a link to the [original repository](https://github.com/victor-iyiola/sage). If you have made a fork with substantial modifications that you feel may be useful, then please [open a new issue on GitHub](https://github.com/victor-iyiola/sage/issues) with a link and short description.
 
 ## License (Apache)
 
