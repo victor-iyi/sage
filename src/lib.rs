@@ -14,6 +14,7 @@ mod processor;
 mod query;
 pub mod schema;
 pub mod types;
+pub mod voc;
 
 /// sage crate `Result` type.
 pub type SageResult<T> = std::result::Result<T, error::SageError>;

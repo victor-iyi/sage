@@ -110,13 +110,43 @@ impl Namespaces {
   /// use sage::schema::Namespaces;
   ///
   /// let ns : Namespaces = Namespaces::new();
-  /// assert_eq!(ns.list().len(), 0);
+  /// assert_eq!(ns.len(), 0);
   /// ```
   ///
   pub fn new() -> Namespaces {
     Namespaces {
       prefixes: HashMap::new(),
     }
+  }
+
+  /// `Namespaces::default` Creates a registry of pre-registered namespaces.
+  ///
+  /// # Example
+  ///
+  /// ```rust
+  /// use sage::schema::Namespaces;
+  ///
+  /// let ns : Namespaces = Namespaces::default();
+  /// assert_eq!(ns.len(), 3);
+  /// ```
+  pub fn default() -> Namespaces {
+    // Use the default vocabularies.
+    use crate::voc::{RdfVoc, RdfsVoc, SchemaVoc, Vocabulary};
+
+    // Create a new mutable namespace store.
+    let mut ns = Namespaces::new();
+
+    // Add the default vocabularies.
+    let ns_list: Vec<Namespace> = vec![
+      Namespace::new(&RdfVoc::prefix(), &RdfVoc::full()),
+      Namespace::new(&RdfsVoc::prefix(), &RdfsVoc::full()),
+      Namespace::new(&SchemaVoc::prefix(), &SchemaVoc::full()),
+    ];
+
+    // Add a collection of namespace objects.
+    ns.add_multiple(&ns_list);
+
+    ns
   }
 
   /// `Namespaces::add` adds a new namespace to the registered list.
@@ -131,11 +161,11 @@ impl Namespaces {
   /// let mut ns = Namespaces::new();
   ///
   /// ns.add(&Namespace::from("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"));
-  /// assert_eq!(ns.list().len(), 1);
+  /// assert_eq!(ns.len(), 1);
   ///
   /// // Creating namespace to be registered.
   /// ns.add(&Namespace::from("schema:Thing", "https://schema.org/Thing"));
-  /// assert_eq!(ns.list().len(), 2);
+  /// assert_eq!(ns.len(), 2);
   /// ```
   ///
   pub fn add(&mut self, ns: &Namespace) {
@@ -160,14 +190,14 @@ impl Namespaces {
   ///   "rdf:type",
   ///   "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
   /// );
-  /// assert_eq!(ns.list().len(), 1);
+  /// assert_eq!(ns.len(), 1);
   ///
   /// // Using IRI reference.
   /// ns.add_prefix(
   ///   &IRI::from("schema:Thing"),
   ///   &IRI::from("https://schema.org/Thing"),
   /// );
-  /// assert_eq!(ns.list().len(), 2);
+  /// assert_eq!(ns.len(), 2);
   /// ```
   ///
   pub fn add_prefix(&mut self, prefix: &str, full: &str) {
@@ -175,6 +205,37 @@ impl Namespaces {
       prefix: prefix.to_string(),
       full: full.to_string(),
     });
+  }
+
+  /// `Namespaces::add_multiple` globally adds a given list of Namespace objects.
+  ///
+  /// # Example
+  ///
+  /// ```rust
+  /// use sage::schema::{Namespace, Namespaces};
+  ///
+  /// // Create a new mutable namespace store.
+  /// let mut ns: Namespaces = Namespaces::new();
+  ///
+  /// // You can use any collection that deref-s into `&[Namespace]`
+  /// let ns_list: Vec<Namespace> = vec![
+  ///   Namespace::from(
+  ///     "rdf:type",
+  ///     "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+  ///   ),
+  ///   Namespace::from("schema:Thing", "https://schema.org/Thing"),
+  /// ];
+  ///
+  /// // Add a collection of namespace objects.
+  /// ns.add_multiple(&ns_list);
+  ///
+  /// assert_eq!(ns.len(), 2);
+  /// ```
+  ///
+  pub fn add_multiple(&mut self, ns: &[Namespace]) {
+    for ref r_ns in ns.iter() {
+      self.add(r_ns.clone());
+    }
   }
 
   /// `Namespaces::short_IRI` replaces a base IRI of a known vocabulary with it's prefix.
@@ -251,6 +312,29 @@ impl Namespaces {
     }
   }
 
+  /// `Namespaces::len` returns the number of registered namespace.
+  ///
+  /// # Example
+  ///
+  /// ```rust
+  /// use sage::schema::{Namespace, Namespaces};
+  ///
+  ///     // Create a new mutable namespace store.
+  /// let mut ns = Namespaces::new();
+  ///
+  /// // Add a new namespace with `Namespaces::add_prefix`.
+  /// ns.add_prefix("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+  /// assert_eq!(ns.len(), 1);
+  ///
+  /// // Add another namespace.
+  /// ns.add_prefix("schema:Thing", "https://schema.org/Thing");
+  /// assert_eq!(ns.len(), 2);
+  ///
+  /// ```
+  pub fn len(&self) -> usize {
+    self.prefixes.len()
+  }
+
   /// `Namespaces::list` enumerates all registered namespace pairs.
   ///
   /// # Example
@@ -272,7 +356,7 @@ impl Namespaces {
   /// ns.add(&rdf);
   /// ns.add(&schema);
   ///
-  /// assert_eq!(ns.list().len(), 2);
+  /// assert_eq!(ns.len(), 2);
   /// assert!(ns.list().contains(&rdf));
   /// assert!(ns.list().contains(&schema));
   /// ```
@@ -288,3 +372,33 @@ impl Namespaces {
   }
 
 }
+/*
+/// Creates a registry of pre-registered namespaces.
+///
+/// # Example
+/// ```rust
+/// use sage::schema::{Namespaces, default_namespaces};
+///
+/// let ns : Namespaces = default_namespaces();
+/// assert_eq!(ns.len(), 3);
+/// ```
+pub fn default_namespaces() -> Namespaces {
+  // Use the default vocabularies.
+  use crate::voc::{RdfVoc, RdfsVoc, SchemaVoc, Vocabulary};
+
+  // Create a new mutable namespace store.
+  let mut ns = Namespaces::new();
+
+  // Add the default vocabularies.
+  let ns_list: Vec<Namespace> = vec![
+    Namespace::new(&RdfVoc::prefix(), &RdfVoc::full()),
+    Namespace::new(&RdfsVoc::prefix(), &RdfsVoc::full()),
+    Namespace::new(&SchemaVoc::prefix(), &SchemaVoc::full()),
+  ];
+
+  // Add a collection of namespace objects.
+  ns.add_multiple(&ns_list);
+
+  ns
+}
+*/
