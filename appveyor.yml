@@ -1,3 +1,4 @@
+version: 1.0.{build}
 environment:
   matrix:
     - APPVEYOR_RUST_CHANNEL: stable
@@ -10,6 +11,11 @@ install:
   - set PATH=C:\msys64\usr\bin;%PATH%;C:\Users\appveyor\.cargo\bin
   - rustc -vV
   - cargo -vV
+
+branches:
+  only:
+    - master
+    - develop
 
 build: false
 

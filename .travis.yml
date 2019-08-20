@@ -32,3 +32,6 @@ script:
   - cd "${TRAVIS_BUILD_DIR}/sage_cli"
   - cargo build
   - cargo test
+
+notifications:
+  email: false
