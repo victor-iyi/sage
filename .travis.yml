@@ -1,0 +1,37 @@
+language: rust
+
+rust:
+  - stable
+  - nightly
+
+matrix:
+  allow_failures:
+    - rust: nightly
+  include:
+    - rust: nightly
+      script:
+        # Build the with nightly version.
+        - rustup run nightly cargo build
+        - rustup run nightly cargo test
+        # Test the command line sage tool.
+        - cd "${TRAVIS_BUILD_DIR}/sage_cli"
+        - rustup run nightly cargo build
+        - rustup run nightly cargo test
+
+cache:
+  cargo: true
+before_cache:
+  # Travis can't cache files that are not readable by "others"
+  - chmod -R a+r $HOME/.cargo
+
+script:
+  # Build with the stable version.
+  - cargo build
+  - cargo test
+  # Test the stable command line sage tool.
+  - cd "${TRAVIS_BUILD_DIR}/sage_cli"
+  - cargo build
+  - cargo test
+
+notifications:
+  email: false
