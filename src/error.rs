@@ -8,7 +8,7 @@
 //! oncology, bad syntax and many more.
 //!
 //! Since `sage` relies mostly on serde_json for parsing JSON files, support
-//! for converting `SageError`s into `serde_json::Error` is also provided with
+//! for converting `Error`s into `serde_json::Error` is also provided with
 //! additional functionalities.
 
 #![allow(dead_code)]
@@ -21,16 +21,16 @@ use std::str::FromStr;
 
 /// This type represents all possible errors that can occur when working
 /// with the `sage` Knowledge Graph.
-pub struct SageError {
-    /// This `Box` allows us to keep the size of `SageError` as small as possible.
-    /// A larger `SageError` type was substantially slower due to all the functions
-    /// that pass around `Result<T, SageError>`.
+pub struct Error {
+    /// This `Box` allows us to keep the size of `Error` as small as possible.
+    /// A larger `Error` type was substantially slower due to all the functions
+    /// that pass around `Result<T, Error>`.
     err: Box<ErrorImpl>,
 }
 
 // Remove two layers of verbosity from the debug representation. Humans often
 // end up seeing this representation because it is what unwrap() shows.
-impl Debug for SageError {
+impl Debug for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
@@ -42,16 +42,16 @@ impl Debug for SageError {
     }
 }
 
-/// Alias for a `Error` with the error type `SageError`.
-pub type Error = SageError;
+/// Alias for a `Error` with the error type `Error`.
+pub type SageError = Error;
 
-/// Alias for a `Result` with the error type `SageError`.
-pub type Result<T> = result::Result<T, SageError>;
+/// Alias for a `Result` with the error type `Error`.
+pub type Result<T> = result::Result<T, Error>;
 
-/// Alias for a `Result` with the error type `SageError`.
-pub type SageResult<T> = result::Result<T, SageError>;
+/// Alias for a `Result` with the error type `Error`.
+pub type SageResult<T> = result::Result<T, Error>;
 
-impl SageError {
+impl Error {
     /// One-based line number at which the error was detected.
     ///
     /// Characters in the first line of the input (before the first newline
@@ -79,12 +79,16 @@ impl SageError {
     /// - `Category::Eof` - unexpected end of the input data
     pub fn classify(&self) -> Category {
         match self.err.code {
+
             ErrorCode::Message(_) => Category::Data,
+
             ErrorCode::Io(_) | ErrorCode::Json(_) => Category::Io,
+
             ErrorCode::EofWhileParsingList
             | ErrorCode::EofWhileParsingObject
             | ErrorCode::EofWhileParsingString
             | ErrorCode::EofWhileParsingValue => Category::Eof,
+
             ErrorCode::ParseError
             | ErrorCode::IllegalNamespace
             | ErrorCode::UnknownNode
@@ -106,6 +110,7 @@ impl SageError {
             | ErrorCode::TrailingCharacters
             | ErrorCode::UnexpectedEndOfHexEscape
             | ErrorCode::RecursionLimitExceeded => Category::Syntax,
+
         }
     }
 
@@ -140,12 +145,12 @@ impl SageError {
     }
 }
 
-impl SageError {
+impl Error {
     // Not public API. Should be pub(crate).
     #[doc(hidden)]
     #[cold]
     pub fn syntax(code: ErrorCode, line: usize, column: usize) -> Self {
-        SageError {
+        Error {
             err: Box::new(ErrorImpl {
                 code: code,
                 line: line,
@@ -160,7 +165,7 @@ impl SageError {
     #[doc(hidden)]
     #[cold]
     pub fn io(error: io::Error) -> Self {
-        SageError {
+        Error {
             err: Box::new(ErrorImpl {
                 code: ErrorCode::Io(error),
                 line: 0,
@@ -174,7 +179,7 @@ impl SageError {
     #[cold]
     pub fn fix_position<F>(self, f: F) -> Self
     where
-        F: FnOnce(ErrorCode) -> SageError,
+        F: FnOnce(ErrorCode) -> Error,
     {
         if self.err.line == 0 {
             f(self.err.code)
@@ -207,8 +212,8 @@ pub enum Category {
     Eof,
 }
 
-impl From<SageError> for io::Error {
-    /// Convert a `sage::SageError` into an `io::Error`.
+impl From<Error> for io::Error {
+    /// Convert a `sage::Error` into an `io::Error`.
     ///
     /// JSON syntax and data errors are turned into `InvalidData` IO errors.
     /// EOF errors are turned into `UnexpectedEof` IO errors.
@@ -235,7 +240,7 @@ impl From<SageError> for io::Error {
     ///     }
     /// }
     /// ```
-    fn from(j: SageError) -> Self {
+    fn from(j: Error) -> Self {
         if let ErrorCode::Io(err) = j.err.code {
             err
         } else {
@@ -387,7 +392,7 @@ impl Display for ErrorCode {
     }
 }
 
-impl error::Error for SageError {
+impl error::Error for Error {
     fn description(&self) -> &str {
         match self.err.code {
             ErrorCode::Io(ref err) => error::Error::description(err),
@@ -398,7 +403,7 @@ impl error::Error for SageError {
         }
     }
 
-    fn cause(&self) -> Option<& dyn error::Error> {
+    fn cause(&self) -> Option<&dyn error::Error> {
         match self.err.code {
             ErrorCode::Io(ref err) => Some(err),
             _ => None,
@@ -406,7 +411,7 @@ impl error::Error for SageError {
     }
 }
 
-impl Display for SageError {
+impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         Display::fmt(&*self.err, f)
     }
