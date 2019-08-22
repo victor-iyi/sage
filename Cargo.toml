@@ -24,3 +24,7 @@ uuid = { version = "0.7", features = ["serde", "v4"] }
 members = [
   "sage_cli"
 ]
+
+[badges]
+appveyor = { repository = "victor-iyiola/sage", branch = "master", service = "github" }
+travis-ci = { repository = "victor-iyiola/sage", branch = "master" }
