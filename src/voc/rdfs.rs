@@ -3,21 +3,34 @@
 use crate::types::IRI;
 use crate::voc::Vocabulary;
 
+/// `RdfsVoc` contains constants of the RDFs vocabulary (RDFS).
+///
+/// `RdfsVoc` implements the `Vocabulary` trait which provides
+/// `RdfsVoc::prefix()` and `RdfsVoc::full()` by default.
+///
+/// ## Basic Usage
+///
+/// ```rust
+/// use sage::types::IRI;
+/// use sage::voc::{Vocabulary, RdfsVoc};
+///
+/// assert_eq!(RdfsVoc::prefix(), IRI::from("rdfs:"));
+/// assert_eq!(RdfsVoc::full(), IRI::from("http://www.w3.org/2000/01/rdf-schema#"));
+/// ```
 pub struct RdfsVoc;
 
 impl Vocabulary for RdfsVoc {
-  type Prefix = IRI;
-  type Full = IRI;
+    type Prefix = IRI;
+    type Full = IRI;
 
-  fn prefix() -> Self::Prefix {
-    IRI::from("rdfs:")
-  }
+    fn prefix() -> Self::Prefix {
+        IRI::from("rdfs:")
+    }
 
-  fn full() -> Self::Full {
-    IRI::from("http://www.w3.org/2000/01/rdf-schema#")
-  }
+    fn full() -> Self::Full {
+        IRI::from("http://www.w3.org/2000/01/rdf-schema#")
+    }
 }
-
 
 /*
  * +----------------------------------------------------------------------+

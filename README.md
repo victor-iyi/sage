@@ -27,6 +27,21 @@ Sage is an open source [Knowledge Graph](https://en.wikipedia.org/wiki/Knowledge
   - Multi threaded / non-blocking
   - Support for [Python](https://github.com/victor-iyiola/sage-py) & JavaScript
 
+## Usage
+
+Add this to your Cargo.toml:
+
+```toml
+[dependencies]
+sage = "0.1"
+```
+
+## Other Language Support
+
+Other supporting projects that extends the functionality of sage to other programming languages.
+
+- [ ] [Python](https://github.com/victor-iyiola/sage-py) bindings for Natural Language Processing.
+- [ ] JavaScript for visualization, web & mobile integration.
 
 ## Contribution
 
