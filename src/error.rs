@@ -398,7 +398,7 @@ impl error::Error for SageError {
         }
     }
 
-    fn cause(&self) -> Option<&error::Error> {
+    fn cause(&self) -> Option<& dyn error::Error> {
         match self.err.code {
             ErrorCode::Io(ref err) => Some(err),
             _ => None,
