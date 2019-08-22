@@ -1,6 +1,5 @@
-
 mod node;
 mod types;
 
-pub use types::NodeTypes;
 pub use node::{Node, NodeStore};
+pub use types::NodeTypes;

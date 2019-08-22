@@ -2,6 +2,15 @@
 //! Knowledge Graph database with `sage`. Handles errors from `io::Error`s
 //! to data validation.
 //!
+//! `sage::error` provides extensive error handler capabilities for
+//!  the `sage` Knowledge Graph engine. These functionalities ranges
+//! from loading files, associating namespaces, linked-data, relational
+//! oncology, bad syntax and many more.
+//!
+//! Since `sage` relies mostly on serde_json for parsing JSON files, support
+//! for converting `SageError`s into `serde_json::Error` is also provided with
+//! additional functionalities.
+
 #![allow(dead_code)]
 
 use std::error;
@@ -71,8 +80,7 @@ impl SageError {
     pub fn classify(&self) -> Category {
         match self.err.code {
             ErrorCode::Message(_) => Category::Data,
-            ErrorCode::Io(_)
-            | ErrorCode::Json(_) => Category::Io,
+            ErrorCode::Io(_) | ErrorCode::Json(_) => Category::Io,
             ErrorCode::EofWhileParsingList
             | ErrorCode::EofWhileParsingObject
             | ErrorCode::EofWhileParsingString
@@ -132,10 +140,6 @@ impl SageError {
     }
 }
 
-
-
-
-
 impl SageError {
     // Not public API. Should be pub(crate).
     #[doc(hidden)]
@@ -180,7 +184,6 @@ impl SageError {
     }
 }
 
-
 /// Categorizes the cause of a `sage::Error`.
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum Category {
@@ -205,7 +208,6 @@ pub enum Category {
 }
 
 impl From<SageError> for io::Error {
-
     /// Convert a `sage::SageError` into an `io::Error`.
     ///
     /// JSON syntax and data errors are turned into `InvalidData` IO errors.
@@ -245,7 +247,6 @@ impl From<SageError> for io::Error {
         }
     }
 }
-
 
 struct ErrorImpl {
     code: ErrorCode,
@@ -386,14 +387,13 @@ impl Display for ErrorCode {
     }
 }
 
-
 impl error::Error for SageError {
     fn description(&self) -> &str {
         match self.err.code {
             ErrorCode::Io(ref err) => error::Error::description(err),
             _ => {
                 // If you want a better message, use Display::fmt or to_string().
-                "JSON error"
+                "Sage error"
             }
         }
     }
