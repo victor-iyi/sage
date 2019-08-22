@@ -1,3 +1,6 @@
+/// `Nodeable` trait should be implemented by every node variant.
+pub trait Nodeable {}
+
 pub struct Node {}
 
 /// `NodeStore` consist of List of node items.

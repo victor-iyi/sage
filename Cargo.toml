@@ -26,5 +26,5 @@ members = [
 ]
 
 [badges]
-appveyor = { repository = "victor-iyiola/sage", branch = "master", service = "github" }
-travis-ci = { repository = "victor-iyiola/sage", branch = "master" }
+appveyor = { repository = "victor-iyiola/sage", service = "github" }
+travis-ci = { repository = "victor-iyiola/sage" }
