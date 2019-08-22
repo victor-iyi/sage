@@ -4,6 +4,13 @@
 //!
 use std::io;
 
+// TODO: Use Error Type Trait & SageError struct.
+// #[derive(Debug)]
+// pub enum ErrorType {
+//     Io(io::Error),
+//     Json(serde_json::Error),
+// }
+
 /// Generic Error handler enum.
 #[derive(Debug)]
 pub enum SageError {

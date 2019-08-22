@@ -1,20 +1,33 @@
 use crate::types::{IRI, URI};
 use crate::voc::Vocabulary;
 
-/// `SchemaVoc` contains constants of the Schema.org vocabulary.
+/// `SchemaVoc` contains constants of the <https://schema.org> vocabulary.
+///
+/// `SchemaVoc` implements the `Vocabulary` trait which provides
+/// `SchemaVoc::prefix()` and `SchemaVoc::full()` by default.
+///
+/// ## Basic Usage
+///
+/// ```rust
+/// use sage::types::IRI;
+/// use sage::voc::{Vocabulary, SchemaVoc};
+///
+/// assert_eq!(SchemaVoc::prefix(), IRI::from("schema:"));
+/// assert_eq!(SchemaVoc::full(), IRI::from("https://schema.org/"));
+/// ```
 pub struct SchemaVoc;
 
 impl Vocabulary for SchemaVoc {
-  type Prefix = IRI;
-  type Full = IRI;
+    type Prefix = IRI;
+    type Full = IRI;
 
-  fn prefix() -> Self::Prefix {
-    IRI::from("schema:")
-  }
+    fn prefix() -> Self::Prefix {
+        IRI::from("schema:")
+    }
 
-  fn full() -> Self::Full {
-    IRI::from("https://schema.org/")
-  }
+    fn full() -> Self::Full {
+        IRI::from("https://schema.org/")
+    }
 }
 
 /*

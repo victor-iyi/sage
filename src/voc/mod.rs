@@ -1,19 +1,13 @@
-//! `sage::voc` module implements an RDF namespace (vocabulary) registry
+//! `sage::voc` module implements an
+//! [Resource Description Framework (RDF)](https://en.wikipedia.org/wiki/Resource_Description_Framework)
+//!  namespace (or vocabulary) registry.
 
 mod rdf;
 mod rdfs;
 mod schema;
+mod voc;
 
 pub use crate::voc::rdf::RdfVoc;
 pub use crate::voc::rdfs::RdfsVoc;
 pub use crate::voc::schema::SchemaVoc;
-
-
-
-pub trait Vocabulary {
-  type Prefix;
-  type Full;
-
-  fn prefix() -> Self::Prefix;
-  fn full() -> Self::Full;
-}
+pub use crate::voc::voc::Vocabulary;
