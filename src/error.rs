@@ -79,7 +79,6 @@ impl Error {
     /// - `Category::Eof` - unexpected end of the input data
     pub fn classify(&self) -> Category {
         match self.err.code {
-
             ErrorCode::Message(_) => Category::Data,
 
             ErrorCode::Io(_) | ErrorCode::Json(_) => Category::Io,
@@ -110,7 +109,6 @@ impl Error {
             | ErrorCode::TrailingCharacters
             | ErrorCode::UnexpectedEndOfHexEscape
             | ErrorCode::RecursionLimitExceeded => Category::Syntax,
-
         }
     }
 
