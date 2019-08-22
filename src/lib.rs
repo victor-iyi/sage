@@ -9,7 +9,8 @@ extern crate serde_json;
 extern crate uuid;
 
 mod datastore;
-mod error;
+pub mod error;
+pub mod graph;
 mod processor;
 mod query;
 pub mod schema;
@@ -21,12 +22,18 @@ pub type SageResult<T> = std::result::Result<T, error::SageError>;
 
 /// Re-exports important traits and types. Meant to be glob imported when using Sage.
 pub mod prelude {
-    pub use crate::error::SageError;
+  // Sage Error handler functionalities.
+  pub use crate::error::{Category, ErrorCode, Result, SageError, SageResult};
 
-    pub use crate::types::{IRI, URI};
-    pub use crate::voc::{RdfVoc, RdfsVoc, SchemaVoc, Vocabulary};
+  // Sage types & vocabularies.
+  pub use crate::types::{IRI, URI};
+  pub use crate::voc::{RdfVoc, RdfsVoc, SchemaVoc, Vocabulary};
 
-    pub use crate::schema::{Namespace, Namespaces};
+  // Sage graph, nodes, connections & ...
+  pub use crate::graph::{Node, NodeStore, NodeTypes};
+
+  // Sage namespace & namespace store.
+  pub use crate::schema::{Namespace, Namespaces};
 }
 
 pub use prelude::*;
