@@ -30,7 +30,7 @@ pub mod prelude {
     pub use crate::voc::{RdfVoc, RdfsVoc, SchemaVoc, Vocabulary};
 
     // Sage graph, nodes, connections & ...
-    pub use crate::graph::{Node, NodeStore, NodeTypes};
+    pub use crate::graph::{Connection, ConnectionType, Node, NodeStore, NodeType};
 
     // Sage namespace & namespace store.
     pub use crate::schema::{Namespace, Namespaces};

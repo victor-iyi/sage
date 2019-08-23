@@ -2,7 +2,7 @@
 //! it does this through building up connections among nodes/entities.
 //! Here are some default connection supported by `sage` by default.
 //!
-//!  ## Connection Types
+//!  ## ConnectionTypes
 //!
 //! - Forward connection
 //! - Shared connection
@@ -12,9 +12,8 @@
 //! These connection types all implements the `sage::graph::Connection` trait.
 
 mod connection;
-mod forward;
-mod multiple;
-mod relational;
-mod shared;
+mod predicate;
+mod types;
 
 pub use connection::Connection;
+pub use types::ConnectionType;

@@ -11,7 +11,7 @@
 //! for converting `Error`s into `serde_json::Error` is also provided with
 //! additional functionalities.
 
-#![allow(dead_code)]
+// #![allow(dead_code)]
 
 use std::error;
 use std::fmt::{self, Debug, Display};
