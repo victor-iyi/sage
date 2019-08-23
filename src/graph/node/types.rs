@@ -4,7 +4,7 @@
 ///
 /// TLDR; `NodeType` represent the different forms which `Node` can exist.
 #[derive(Debug)]
-pub enum NodeTypes {
+pub enum NodeType {
     /// `BlankNode` containing node with empty or null data.
     BlankNode,
 
