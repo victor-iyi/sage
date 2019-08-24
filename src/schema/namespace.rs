@@ -27,7 +27,7 @@ impl Namespace {
     /// assert_eq!(ns.full(), &full);
     /// ```
     ///
-    pub fn new(prefix: &IRI, full: &IRI) -> Namespace {
+    pub fn new(prefix: &str, full: &str) -> Namespace {
         Namespace {
             prefix: prefix.to_string(),
             full: full.to_string(),
@@ -70,7 +70,7 @@ impl Namespace {
     /// assert_eq!(ns.prefix(), &IRI::from("rdf:type"));
     /// ```
     pub fn prefix(&self) -> &str {
-        return &self.prefix;
+        &self.prefix
     }
 
     /// Returns a reference to the namespace full IRI.
@@ -87,12 +87,12 @@ impl Namespace {
     ///  assert_eq!(ns.full(), &IRI::from("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"));
     /// ```
     pub fn full(&self) -> &str {
-        return &self.full;
+        &self.full
     }
 }
 
 /// `Namespaces` is a set of registered namespaces.
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Default, PartialEq, Clone)]
 pub struct Namespaces {
     /// List of registered namespace prefix & full `IRI` values.
     prefixes: HashMap<IRI, IRI>,
@@ -167,7 +167,7 @@ impl Namespaces {
     /// ```
     ///
     pub fn add(&mut self, ns: &Namespace) {
-        &self
+        self
             .prefixes
             .insert(ns.prefix().to_string(), ns.full().to_string());
     }
@@ -199,7 +199,7 @@ impl Namespaces {
     /// ```
     ///
     pub fn add_prefix(&mut self, prefix: &str, full: &str) {
-        &self.add(&Namespace {
+        self.add(&Namespace {
             prefix: prefix.to_string(),
             full: full.to_string(),
         });
@@ -231,8 +231,8 @@ impl Namespaces {
     /// ```
     ///
     pub fn add_multiple(&mut self, ns: &[Namespace]) {
-        for ref r_ns in ns.iter() {
-            self.add(r_ns.clone());
+        for r_ns in ns.iter() {
+            self.add(&(*r_ns).clone());
         }
     }
 
@@ -331,6 +331,30 @@ impl Namespaces {
     /// ```
     pub fn len(&self) -> usize {
         self.prefixes.len()
+    }
+
+    /// `Namespaces::is_empty` returns `true` if there are no item in the `NamespaceStore`.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use sage::schema::{Namespace, Namespaces};
+    ///
+    ///     // Create a new mutable namespace store.
+    /// let mut ns = Namespaces::new();
+    /// assert_eq!(ns.is_empty(), true);
+    ///
+    /// // Add a new namespace with `Namespaces::add_prefix`.
+    /// ns.add_prefix("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+    /// assert_eq!(ns.is_empty(), false);
+    ///
+    /// // Add another namespace.
+    /// ns.add_prefix("schema:Thing", "https://schema.org/Thing");
+    /// assert_eq!(ns.len(), 2);
+    ///
+    /// ```
+    pub fn is_empty(&self) -> bool {
+        self.prefixes.len() == 0
     }
 
     /// `Namespaces::list` enumerates all registered namespace pairs.

@@ -11,9 +11,9 @@
 //!
 //! These connection types all implements the `sage::graph::Connection` trait.
 
-mod connection;
+mod connection_impl;
 mod predicate;
 mod types;
 
-pub use connection::Connection;
+pub use connection_impl::Connection;
 pub use types::ConnectionType;
