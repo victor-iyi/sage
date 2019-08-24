@@ -7,4 +7,4 @@ mod namespace;
 mod rdf;
 mod wikidata;
 
-pub use namespace::{Namespace, Namespaces};
+pub use namespace::{Namespace, NamespaceStore, Namespaces};

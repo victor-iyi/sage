@@ -33,6 +33,7 @@ impl Namespace {
             full: full.to_string(),
         }
     }
+
     /// Creates a new namespace from a string slice.
     ///
     /// # Example
@@ -54,6 +55,7 @@ impl Namespace {
             full: full.to_string(),
         }
     }
+
     /// Returns a reference to the namespace prefix.
     ///
     /// # Example
@@ -113,6 +115,7 @@ impl Namespaces {
             prefixes: HashMap::new(),
         }
     }
+
     /// `Namespaces::default` Creates a registry of pre-registered namespaces.
     ///
     /// # Example
@@ -154,10 +157,11 @@ impl Namespaces {
     /// // Create a Namespace store.
     /// let mut ns = Namespaces::new();
     ///
+    /// // Add a new namespace created from `Namespace::from` API.
     /// ns.add(&Namespace::from("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"));
     /// assert_eq!(ns.len(), 1);
     ///
-    /// // Creating namespace to be registered.
+    ///// Let's register another namespace.
     /// ns.add(&Namespace::from("schema:Thing", "https://schema.org/Thing"));
     /// assert_eq!(ns.len(), 2);
     /// ```
@@ -231,6 +235,7 @@ impl Namespaces {
             self.add(r_ns.clone());
         }
     }
+
     /// `Namespaces::short_IRI` replaces a base IRI of a known vocabulary with it's prefix.
     ///
     ///	short_iri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") // returns "rdf:type"
@@ -268,6 +273,7 @@ impl Namespaces {
         }
         iri.to_string()
     }
+
     /// `Namespaces::full_IRI` replaces known prefix in IRI with it's full vocabulary `IRI`.
     ///
     ///	full_iri("rdf:type") // returns "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
@@ -303,6 +309,7 @@ impl Namespaces {
             None => iri.to_string(),
         }
     }
+
     /// `Namespaces::len` returns the number of registered namespace.
     ///
     /// # Example
@@ -362,3 +369,8 @@ impl Namespaces {
         ns
     }
 }
+
+/// Alias for `Namespaces` so it won't be confused with `Namespace`.
+/// `Namespace` and `NamespaceStore` are a collection of multiple
+/// `Namespace`.
+pub type NamespaceStore = Namespaces;
