@@ -1,8 +1,8 @@
-#![allow(unused_imports)]
+#![allow(dead_code)]
 
 extern crate dotenv;
-#[macro_use]
-extern crate log;
+// #[macro_use]
+// extern crate log;
 extern crate ntriple;
 extern crate rdf;
 extern crate serde_json;
