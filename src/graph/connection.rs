@@ -1,10 +1,23 @@
+//!  ## ConnectionTypes
+//!
+//! - Forward connection
+//! - Shared connection
+//! - Relational connection
+//! - multiple connection
+//!
+//! These connection types all implements the `sage::graph::Connection` trait.
+//!
+
+/// `Connection` trait should be implemented by every connection type.
+pub trait Connection {}
+
 /// `sage` represents real world information in a graph-like structure.
 /// It does this through building up connections among entities. This
 /// connections are named `ConnectionType` abd consists of many variants.
 /// Here are some possible connections that can occur among entities
 /// (or nodes) in the graph.
 pub enum ConnectionType {
-    /// `**Forward Connection** connects two nodes together at a time.
+    /// *Forward Connection* connects two nodes together at a time.
     /// This connection might occur multiple times.
     ///
     /// For example: `John --born in-> London` & `John --current location-> Fiji`.
@@ -12,7 +25,7 @@ pub enum ConnectionType {
     /// "Fiji" doesn't necessarily have a direct connection with "John".
     Forward,
 
-    /// **Shared Connection** creates a two-way connection between two nodes.
+    /// *Shared Connection* creates a two-way connection between two nodes.
     /// Both nodes share the same connection with each other.
     ///
     /// For example: `Jane <- friend of -> John`. Here, "Jane" is a *"friend of"* "John",
@@ -26,7 +39,7 @@ pub enum ConnectionType {
     /// and it doesn't really tell much about how they are related to one another.
     Shared,
 
-    /// **Relational connection** represents relationship between two
+    /// *Relational connection* represents relationship between two
     /// or more nodes such that the first node has a different relationship
     /// with the second and the second has a different relationship with the first.
     ///
