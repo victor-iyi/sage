@@ -1,5 +1,6 @@
 mod connection;
 mod node;
+mod predicate;
 
 pub use connection::{Connection, ConnectionType};
 pub use node::{Node, NodeStore, NodeType};

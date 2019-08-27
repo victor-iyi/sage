@@ -1,4 +1,5 @@
 language: rust
+# dist: trusty
 
 rust:
   - stable
@@ -18,15 +19,16 @@ matrix:
         - rustup run nightly cargo build
         - rustup run nightly cargo test
 
+cache:
+  cargo: true
 
 before_cache:
   # Travis can't cache files that are not readable by "others"
   - chmod -R a+r $HOME/.cargo
-cache:
-  cargo: true
 
 before_script:
-  - rustup component add rustfmt
+  - rustup component add rustfmt clippy
+
 script:
   # Build with the stable version.
   - cargo build

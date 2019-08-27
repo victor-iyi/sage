@@ -5,9 +5,9 @@
 mod rdf;
 mod rdfs;
 mod schema;
-mod voc;
+mod vocabulary;
 
 pub use crate::voc::rdf::RdfVoc;
 pub use crate::voc::rdfs::RdfsVoc;
 pub use crate::voc::schema::SchemaVoc;
-pub use crate::voc::voc::Vocabulary;
+pub use crate::voc::vocabulary::Vocabulary;

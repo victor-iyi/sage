@@ -9,27 +9,29 @@ Sage is an open source [Knowledge Graph](https://en.wikipedia.org/wiki/Knowledge
 
 ## Features / Advantages
 
-- Usage
+- **Usage**
   - Easy to get started
   - Simple & intuitive Query API
-- Features
+- **Features**
   - Built-in visualizer
   - Multi-schema support
   - REST / GraphQL API
   - Command line interface
-- Natural Language Processing
+- **Machine Learning**
+  - Natural Language Processing
   - Semantic parser
   - Graph Neural Network
   - Graph embedding
-- Bonus
-  - Written in Rust (lightening fast)
+- **Bonus**
+  - Written in Rust *(lightening fast)*
   - Community driven
   - Multi threaded / non-blocking
-  - Support for [Python](https://github.com/victor-iyiola/sage-py) & JavaScript
+  - Support for [Python](https://github.com/victor-iyiola/sage-py) for Machine Learning tasks.
+  - Support for [JavaScript](https://github.com/victor-iyiola/sage-js) for Web Assembly & Mobile integration.
 
 ## Usage
 
-Add this to your Cargo.toml:
+Add this to your `[dependencies]` section in your `Cargo.toml` file.
 
 ```toml
 [dependencies]
@@ -41,7 +43,7 @@ sage = "0.1"
 Other supporting projects that extends the functionality of sage to other programming languages.
 
 - [ ] [Python](https://github.com/victor-iyiola/sage-py) bindings for Natural Language Processing.
-- [ ] JavaScript for visualization, web & mobile integration.
+- [ ] [JavaScript](https://github.com/victor-iyiola/sage-js) for visualization, web & mobile integration.
 
 ## Contribution
 

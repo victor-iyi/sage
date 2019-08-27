@@ -1,4 +1,4 @@
-use crate::types::{IRI, URI};
+use crate::types::IRI;
 use crate::voc::Vocabulary;
 
 /// `SchemaVoc` contains constants of the <https://schema.org> vocabulary.

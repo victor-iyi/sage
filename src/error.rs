@@ -17,7 +17,7 @@ use std::error;
 use std::fmt::{self, Debug, Display};
 use std::io;
 use std::result;
-use std::str::FromStr;
+// use std::str::FromStr;
 
 /// This type represents all possible errors that can occur when working
 /// with the `sage` Knowledge Graph.
@@ -149,11 +149,7 @@ impl Error {
     #[cold]
     pub fn syntax(code: ErrorCode, line: usize, column: usize) -> Self {
         Error {
-            err: Box::new(ErrorImpl {
-                code: code,
-                line: line,
-                column: column,
-            }),
+            err: Box::new(ErrorImpl { code, line, column }),
         }
     }
 
