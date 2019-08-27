@@ -25,9 +25,8 @@ pub enum NodeType {
   LiteralNode,
 }
 
-
 /// `Nodeable` trait should be implemented by every node variant.
-pub trait Nodeable {}
+pub trait Nodeable<T> {}
 
 pub struct Node {
   node: Box<NodeImpl>,
