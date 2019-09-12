@@ -7,22 +7,22 @@
 /// TLDR; `NodeType` represent the different forms which `Node` can exist.
 #[derive(Debug)]
 pub enum NodeType {
-  /// `BlankNode` containing node with empty or null data.
-  BlankNode,
+  /// `Blank` node containing node with empty or null data.
+  Blank,
 
-  /// `SchemaNode` is created from some type of data structure.
+  /// `Schema` node is created from some type of data structure.
   /// Usually but not limited to `struct`s.
-  SchemaNode,
+  Schema,
 
-  /// `HttpNode` is used to represent data coming from an external/http source.
+  /// `Http` node is used to represent data coming from an external/http source.
   /// And example of such [James Cameron](https://www.wikidata.org/wiki/Q42574)
   /// node gotten from [wikidata](https://www.wikidata.org/wiki/Wikidata:Main_Page).
-  HttpNode,
+  Http,
 
-  /// `LiteralNode` is used to represent nodes with primitive types
+  /// `Literal` node is used to represent nodes with primitive types
   /// like `Strings`, `Numbers`, `Date`, `Time`, `DateTime` etc.
   /// which contains no extra data associated to this node.
-  LiteralNode,
+  Literal,
 }
 
 /// `Nodeable` trait should be implemented by every node variant.

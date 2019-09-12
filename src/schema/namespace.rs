@@ -393,8 +393,8 @@ impl NamespaceStore {
     }
 }
 
-/// Alias for `Namespaces` so it won't be confused with `NamespaceStore`.
+/// `Namespaces` Alias for `NamespaceStore` to avoid confusion or misinterpretation.
 ///
-/// `Namespaces` and `NamespaceStore` are a collection of multiple
+/// `NamespaceStore` or `Namespaces` are a collection of multiple
 /// `Namespace`.
 pub type Namespaces = NamespaceStore;
