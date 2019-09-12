@@ -128,16 +128,16 @@ impl NamespaceStore {
     /// ```
     pub fn default() -> NamespaceStore {
         // Use the default vocabularies.
-        use crate::vocab::{RdfVoc, RdfsVoc, SchemaVoc, Vocabulary};
+        use crate::vocab::{RdfVocab, RdfsVocab, SchemaVocab, Vocabulary};
 
         // Create a new mutable namespace store.
         let mut ns = NamespaceStore::new();
 
         // Add the default vocabularies.
         let ns_list: Vec<Namespace> = vec![
-            Namespace::new(&RdfVoc::prefix(), &RdfVoc::full()),
-            Namespace::new(&RdfsVoc::prefix(), &RdfsVoc::full()),
-            Namespace::new(&SchemaVoc::prefix(), &SchemaVoc::full()),
+            Namespace::new(&RdfVocab::prefix(), &RdfVocab::full()),
+            Namespace::new(&RdfsVocab::prefix(), &RdfsVocab::full()),
+            Namespace::new(&SchemaVocab::prefix(), &SchemaVocab::full()),
         ];
 
         // Add a collection of namespace objects.

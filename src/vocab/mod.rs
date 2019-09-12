@@ -7,7 +7,7 @@ mod rdfs;
 mod schema;
 mod vocabulary;
 
-pub use crate::vocab::rdf::RdfVoc;
-pub use crate::vocab::rdfs::RdfsVoc;
-pub use crate::vocab::schema::SchemaVoc;
+pub use crate::vocab::rdf::RdfVocab;
+pub use crate::vocab::rdfs::RdfsVocab;
+pub use crate::vocab::schema::SchemaVocab;
 pub use crate::vocab::vocabulary::Vocabulary;
