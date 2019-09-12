@@ -25,7 +25,6 @@ pub enum NodeType {
   LiteralNode,
 }
 
-
 /// `Nodeable` trait should be implemented by every node variant.
 pub trait Nodeable {}
 
@@ -42,7 +41,7 @@ pub struct NodeStore {
 }
 
 impl NodeStore {
-  /// Creates a new instance of a `NodeStore`.
+  /// Creates an empty instance of a `NodeStore`.
   ///
   /// # Example
   ///
@@ -55,6 +54,7 @@ impl NodeStore {
   pub fn new() -> NodeStore {
     NodeStore { nodes: Vec::new() }
   }
+
   pub fn nodes(&self) -> &[Node] {
     &self.nodes
   }

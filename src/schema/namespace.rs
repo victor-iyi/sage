@@ -128,7 +128,7 @@ impl Namespaces {
     /// ```
     pub fn default() -> Namespaces {
         // Use the default vocabularies.
-        use crate::voc::{RdfVoc, RdfsVoc, SchemaVoc, Vocabulary};
+        use crate::vocab::{RdfVoc, RdfsVoc, SchemaVoc, Vocabulary};
 
         // Create a new mutable namespace store.
         let mut ns = Namespaces::new();
@@ -167,8 +167,7 @@ impl Namespaces {
     /// ```
     ///
     pub fn add(&mut self, ns: &Namespace) {
-        self
-            .prefixes
+        self.prefixes
             .insert(ns.prefix().to_string(), ns.full().to_string());
     }
 

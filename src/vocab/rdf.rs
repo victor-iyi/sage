@@ -1,7 +1,7 @@
 //! Module `rdf` contains constants of the RDF Concepts Vocabulary (RDF)
 
 use crate::types::IRI;
-use crate::voc::Vocabulary;
+use crate::vocab::Vocabulary;
 
 /// `RdfVoc` contains constants of the Resource Description Framework (RDF) vocabulary.
 ///

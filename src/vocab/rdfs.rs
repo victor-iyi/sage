@@ -1,7 +1,7 @@
 //! Module `rdfs` contains constants of the RDF Schema vocabulary (RDFS)
 
 use crate::types::IRI;
-use crate::voc::Vocabulary;
+use crate::vocab::Vocabulary;
 
 /// `RdfsVoc` contains constants of the RDFs vocabulary (RDFS).
 ///
