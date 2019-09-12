@@ -15,25 +15,25 @@ mod processor;
 mod query;
 pub mod schema;
 pub mod types;
-pub mod voc;
+pub mod vocab;
 
 /// Sage crate `Result` type.
 pub type SageResult<T> = std::result::Result<T, error::SageError>;
 
 /// Re-exports important traits and types. Meant to be glob imported when using Sage.
 pub mod prelude {
-    // Sage Error handler functionalities.
-    pub use crate::error::{Category, Error, ErrorCode, Result, SageError, SageResult};
+  // Sage Error handler functionalities.
+  pub use crate::error::{Category, Error, ErrorCode, Result, SageError, SageResult};
 
-    // Sage types & vocabularies.
-    pub use crate::types::{IRI, URI};
-    pub use crate::voc::{RdfVoc, RdfsVoc, SchemaVoc, Vocabulary};
+  // Sage types & vocabularies.
+  pub use crate::types::{IRI, URI};
+  pub use crate::vocab::{RdfVoc, RdfsVoc, SchemaVoc, Vocabulary};
 
-    // Sage graph, nodes, connections & ...
-    pub use crate::graph::{Connection, ConnectionType, Node, NodeStore, NodeType};
+  // Sage graph, nodes, connections & ...
+  pub use crate::graph::{Connection, ConnectionType, Node, NodeStore, NodeType};
 
-    // Sage namespace & namespace store.
-    pub use crate::schema::{Namespace, Namespaces};
+  // Sage namespace & namespace store.
+  pub use crate::schema::{Namespace, NamespaceStore, Namespaces};
 }
 
 pub use prelude::*;

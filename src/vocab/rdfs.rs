@@ -1,7 +1,7 @@
 //! Module `rdfs` contains constants of the RDF Schema vocabulary (RDFS)
 
 use crate::types::IRI;
-use crate::voc::Vocabulary;
+use crate::vocab::Vocabulary;
 
 /// `RdfsVoc` contains constants of the RDFs vocabulary (RDFS).
 ///
@@ -12,7 +12,7 @@ use crate::voc::Vocabulary;
 ///
 /// ```rust
 /// use sage::types::IRI;
-/// use sage::voc::{Vocabulary, RdfsVoc};
+/// use sage::vocab::{Vocabulary, RdfsVoc};
 ///
 /// assert_eq!(RdfsVoc::prefix(), IRI::from("rdfs:"));
 /// assert_eq!(RdfsVoc::full(), IRI::from("http://www.w3.org/2000/01/rdf-schema#"));
