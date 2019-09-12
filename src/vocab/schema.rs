@@ -1,5 +1,5 @@
 use crate::types::IRI;
-use crate::voc::Vocabulary;
+use crate::vocab::Vocabulary;
 
 /// `SchemaVoc` contains constants of the <https://schema.org> vocabulary.
 ///
@@ -18,16 +18,16 @@ use crate::voc::Vocabulary;
 pub struct SchemaVoc;
 
 impl Vocabulary for SchemaVoc {
-    type Prefix = IRI;
-    type Full = IRI;
+  type Prefix = IRI;
+  type Full = IRI;
 
-    fn prefix() -> Self::Prefix {
-        IRI::from("schema:")
-    }
+  fn prefix() -> Self::Prefix {
+    IRI::from("schema:")
+  }
 
-    fn full() -> Self::Full {
-        IRI::from("https://schema.org/")
-    }
+  fn full() -> Self::Full {
+    IRI::from("https://schema.org/")
+  }
 }
 
 /*
