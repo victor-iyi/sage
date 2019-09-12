@@ -27,13 +27,13 @@ pub mod prelude {
 
   // Sage types & vocabularies.
   pub use crate::types::{IRI, URI};
-  pub use crate::vocab::{RdfVoc, RdfsVoc, SchemaVoc, Vocabulary};
+  pub use crate::vocab::{RdfVocab, RdfsVocab, SchemaVocab, Vocabulary};
 
   // Sage graph, nodes, connections & ...
   pub use crate::graph::{Connection, ConnectionType, Node, NodeStore, NodeType};
 
   // Sage namespace & namespace store.
-  pub use crate::schema::{Namespace, Namespaces};
+  pub use crate::schema::{Namespace, NamespaceStore, Namespaces};
 }
 
 pub use prelude::*;

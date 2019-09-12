@@ -3,23 +3,23 @@
 use crate::types::IRI;
 use crate::vocab::Vocabulary;
 
-/// `RdfVoc` contains constants of the Resource Description Framework (RDF) vocabulary.
+/// `RdfVocab` contains constants of the Resource Description Framework (RDF) vocabulary.
 ///
-/// `RdfVoc` implements the `Vocabulary` trait which provides
-/// `RdfVoc::prefix()` and `RdfVoc::full()` by default.
+/// `RdfVocab` implements the `Vocabulary` trait which provides
+/// `RdfVocab::prefix()` and `RdfVocab::full()` by default.
 ///
 /// ## Basic Usage
 ///
 /// ```rust
 /// use sage::types::IRI;
-/// use sage::voc::{Vocabulary, RdfVoc};
+/// use sage::vocab::{Vocabulary, RdfVocab};
 ///
-/// assert_eq!(RdfVoc::prefix(), IRI::from("rdf:"));
-/// assert_eq!(RdfVoc::full(), IRI::from("http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
+/// assert_eq!(RdfVocab::prefix(), IRI::from("rdf:"));
+/// assert_eq!(RdfVocab::full(), IRI::from("http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
 /// ```
-pub struct RdfVoc;
+pub struct RdfVocab;
 
-impl Vocabulary for RdfVoc {
+impl Vocabulary for RdfVocab {
     type Prefix = IRI;
     type Full = IRI;
 
