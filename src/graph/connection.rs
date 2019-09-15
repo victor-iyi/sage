@@ -3,7 +3,7 @@
 //! - Forward connection
 //! - Shared connection
 //! - Relational connection
-//! - multiple connection
+//! - Multiple connection
 //!
 //! These connection types all implements the `sage::graph::Connection` trait.
 //!

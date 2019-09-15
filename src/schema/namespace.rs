@@ -2,6 +2,51 @@ use crate::types::IRI;
 
 use std::collections::HashMap;
 
+/// `URI` expands and contracts a URL given it's context and the property.
+pub struct URI {
+    /// `context` for example http://schema.org which is the base URI for the node.
+    context: IRI,
+
+    /// `short` could for example be `Person`. The URI will combine
+    /// both together to form "https://schema.org/Person".
+    short: IRI,
+}
+
+impl URI {
+    /// Creates a new `URI` instance.
+    ///
+    /// ## Basic Usage
+    ///
+    /// ```rust
+    /// use sage::schema::URI;
+    ///
+    /// let val = URI::new("https://schema.org", "Person");
+    ///
+    /// assert_eq!(val.context(), "https://schema.org");
+    /// assert_eq!(val.short(), "Person");
+    /// assert_eq!(val.expand(), "https://schema.org/Person");
+    /// ```
+    ///
+    pub fn new(context: &str, short: &str) -> URI {
+        URI {
+            context: context.to_string(),
+            short: short.to_string(),
+        }
+    }
+
+    pub fn context(&self) -> &IRI {
+        &self.context
+    }
+
+    pub fn short(&self) -> &IRI {
+        &self.short
+    }
+
+    pub fn expand(&self) -> IRI {
+        format!("{}/{}", &self.context.trim_end_matches('/'), &self.short)
+    }
+}
+
 /// Namespace is a RDF namespace (vocabulary).
 #[derive(Debug, PartialEq, Clone)]
 pub struct Namespace {

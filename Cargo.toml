@@ -6,7 +6,7 @@ edition = "2018"
 readme = "README.md"
 description = "Sage is an open source Knowledge Graph used to represent linked-data."
 license = "Apache-2.0"
-repository = "https://github.com/victor-iyiola/rust-sage"
+repository = "https://github.com/victor-iyiola/sage"
 keywords = ["knowledge-graph", "linked-data", "sage"]
 
 [lib]
@@ -17,6 +17,7 @@ dotenv = "0.14"
 log = "0.4"
 ntriple = "0.1.1"
 rdf = "0.1.4"
+rand = "0.7.0"
 serde_json = "1.0"
 uuid = { version = "0.7", features = ["serde", "v4"] }
 
