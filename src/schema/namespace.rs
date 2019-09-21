@@ -210,6 +210,22 @@ impl NamespaceStore {
     /// ns.add(&Namespace::from("schema:Thing", "https://schema.org/Thing"));
     /// assert_eq!(ns.len(), 2);
     /// ```
+    /// You could also use `NamespaceStore` alias -> `Namespaces`, in case you say it's too long.
+    ///
+    /// ```rust
+    /// use sage::types::IRI;
+    /// use sage::schema::{Namespace, Namespaces};
+    ///
+    /// // Create a Namespace store.
+    /// let mut ns = Namespaces::new();
+    ///
+    /// // Add a new namespace created from `Namespace::from` API.
+    /// ns.add(&Namespace::from("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"));
+    /// assert_eq!(ns.len(), 1);
+    ///
+    ///// Let's register another namespace.
+    /// ns.add(&Namespace::from("schema:Thing", "https://schema.org/Thing"));
+    /// assert_eq!(ns.len(), 2);
     ///
     pub fn add(&mut self, ns: &Namespace) {
         self.prefixes
