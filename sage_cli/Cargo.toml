@@ -16,3 +16,4 @@ path = "src/main.rs"
 
 [dependencies]
 clap = "2.33.0"
+sage = { path = "../../sage" }
