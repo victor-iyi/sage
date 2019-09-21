@@ -24,14 +24,14 @@ pub type SageResult<T> = std::result::Result<T, error::SageError>;
 /// Re-exports important traits and types. Meant to be glob imported when using Sage.
 pub mod prelude {
   // Sage Error handler functionalities.
-  pub use crate::error::{Category, Error, ErrorCode, SageError, SageResult};
+  pub use crate::error::*;
 
   // Sage types & vocabularies.
   pub use crate::types::{IRI, URI};
   pub use crate::vocab::*;
 
   // Sage graph, nodes, connections & ...
-  pub use crate::graph::{Connection, ConnectionType, Node, NodeStore, NodeType};
+  pub use crate::graph::*;
 
   // Sage namespace & namespace store.
   pub use crate::schema::*;
