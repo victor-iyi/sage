@@ -18,7 +18,7 @@ impl URI {
     /// ## Basic Usage
     ///
     /// ```rust
-    /// use sage::schema::URI;
+    /// use sage::vocab::URI;
     ///
     /// let val = URI::new("https://schema.org", "Person");
     ///
@@ -61,7 +61,7 @@ impl Namespace {
     ///
     /// ```rust
     /// use sage::types::IRI;
-    /// use sage::schema::Namespace;
+    /// use sage::vocab::Namespace;
     ///
     /// let prefix: IRI = IRI::from("rdf:type");
     /// let full: IRI = IRI::from("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
@@ -85,7 +85,7 @@ impl Namespace {
     ///
     /// ```rust
     /// use sage::types::IRI;
-    /// use sage::schema::Namespace;
+    /// use sage::vocab::Namespace;
     ///
     /// // Creates a new namespace using a sing literal.
     /// let ns = Namespace::from("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
@@ -107,7 +107,7 @@ impl Namespace {
     ///
     /// ```rust
     /// use sage::types::IRI;
-    /// use sage::schema::Namespace;
+    /// use sage::vocab::Namespace;
     ///
     /// // Creates a new namespace using a sing literal.
     /// let ns = Namespace::from("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
@@ -124,7 +124,7 @@ impl Namespace {
     ///
     /// ```rust
     /// use sage::types::IRI;
-    /// use sage::schema::Namespace;
+    /// use sage::vocab::Namespace;
     ///
     /// // Creates a new namespace using a sing literal.
     /// let ns = Namespace::from("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
@@ -149,7 +149,7 @@ impl NamespaceStore {
     /// # Example
     ///
     /// ```rust
-    /// use sage::schema::NamespaceStore;
+    /// use sage::vocab::NamespaceStore;
     ///
     /// let ns : NamespaceStore = NamespaceStore::new();
     /// assert_eq!(ns.len(), 0);
@@ -166,7 +166,7 @@ impl NamespaceStore {
     /// # Example
     ///
     /// ```rust
-    /// use sage::schema::NamespaceStore;
+    /// use sage::vocab::NamespaceStore;
     ///
     /// let ns : NamespaceStore = NamespaceStore::default();
     /// assert_eq!(ns.len(), 3);
@@ -197,7 +197,7 @@ impl NamespaceStore {
     ///
     /// ```rust
     /// use sage::types::IRI;
-    /// use sage::schema::{Namespace, NamespaceStore};
+    /// use sage::vocab::{Namespace, NamespaceStore};
     ///
     /// // Create a Namespace store.
     /// let mut ns = NamespaceStore::new();
@@ -214,7 +214,7 @@ impl NamespaceStore {
     ///
     /// ```rust
     /// use sage::types::IRI;
-    /// use sage::schema::{Namespace, Namespaces};
+    /// use sage::vocab::{Namespace, Namespaces};
     ///
     /// // Create a Namespace store.
     /// let mut ns = Namespaces::new();
@@ -238,7 +238,7 @@ impl NamespaceStore {
     ///
     /// ```rust
     /// use sage::types::IRI;
-    /// use sage::schema::NamespaceStore;
+    /// use sage::vocab::NamespaceStore;
     ///
     /// // Create a mutable namespace store.
     /// let mut ns = NamespaceStore::new();
@@ -270,7 +270,7 @@ impl NamespaceStore {
     /// # Example
     ///
     /// ```rust
-    /// use sage::schema::{Namespace, NamespaceStore};
+    /// use sage::vocab::{Namespace, NamespaceStore};
     ///
     /// // Create a new mutable namespace store.
     /// let mut ns: NamespaceStore = NamespaceStore::new();
@@ -304,7 +304,7 @@ impl NamespaceStore {
     ///
     /// ```
     /// use sage::types::IRI;
-    /// use sage::schema::NamespaceStore;
+    /// use sage::vocab::NamespaceStore;
     ///
     /// // Create a mutable namespace store.
     /// let mut ns = NamespaceStore::new();
@@ -342,7 +342,7 @@ impl NamespaceStore {
     ///
     /// ```rust
     /// use sage::types::IRI;
-    /// use sage::schema::NamespaceStore;
+    /// use sage::vocab::NamespaceStore;
     ///
     ///   // Create a mutable namespace store.
     /// let mut ns = NamespaceStore::new();
@@ -375,7 +375,7 @@ impl NamespaceStore {
     /// # Example
     ///
     /// ```rust
-    /// use sage::schema::{Namespace, NamespaceStore};
+    /// use sage::vocab::{Namespace, NamespaceStore};
     ///
     ///     // Create a new mutable namespace store.
     /// let mut ns = NamespaceStore::new();
@@ -398,7 +398,7 @@ impl NamespaceStore {
     /// # Example
     ///
     /// ```rust
-    /// use sage::schema::{Namespace, NamespaceStore};
+    /// use sage::vocab::{Namespace, NamespaceStore};
     ///
     ///     // Create a new mutable namespace store.
     /// let mut ns = NamespaceStore::new();
@@ -422,7 +422,7 @@ impl NamespaceStore {
     /// # Example
     ///
     /// ```rust
-    /// use sage::schema::{Namespace, NamespaceStore};
+    /// use sage::vocab::{Namespace, NamespaceStore};
     ///
     ///     // Create a new mutable namespace store.
     /// let mut ns = NamespaceStore::new();

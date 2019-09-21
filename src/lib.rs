@@ -28,7 +28,7 @@ pub mod prelude {
 
   // Sage types & vocabularies.
   pub use crate::types::{IRI, URI};
-  pub use crate::vocab::{RdfVocab, RdfsVocab, SchemaVocab, Vocabulary};
+  pub use crate::vocab::*;
 
   // Sage graph, nodes, connections & ...
   pub use crate::graph::{Connection, ConnectionType, Node, NodeStore, NodeType};

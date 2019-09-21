@@ -2,12 +2,17 @@
 //! [Resource Description Framework (RDF)](https://en.wikipedia.org/wiki/Resource_Description_Framework)
 //!  namespace (or vocabulary) registry.
 
+mod namespace;
 mod rdf;
 mod rdfs;
 mod schema;
 mod vocabulary;
 
+// Ambiguous export.
 pub use crate::vocab::rdf::RdfVocab;
-pub use crate::vocab::rdfs::RdfsVocab;
-pub use crate::vocab::schema::SchemaVocab;
-pub use crate::vocab::vocabulary::Vocabulary;
+
+// Unambiguous export.
+pub use namespace::{Namespace, NamespaceStore, Namespaces, URI};
+pub use rdfs::RdfsVocab;
+pub use schema::SchemaVocab;
+pub use vocabulary::Vocabulary;

@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use crate::schema::Namespace;
+use crate::vocab::Namespace;
 
 /// Predicate is the actual data contained when two `Node`s are connected through some `ConnectionType`.
 pub trait Pred<T> {}
