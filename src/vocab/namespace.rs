@@ -137,7 +137,7 @@ impl Namespace {
 }
 
 /// `NamespaceStore` is a set of registered NamespaceStore.
-#[derive(Debug, Default, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct NamespaceStore {
     /// List of registered namespace prefix & full `IRI` values.
     prefixes: HashMap<IRI, IRI>,
@@ -159,36 +159,6 @@ impl NamespaceStore {
         NamespaceStore {
             prefixes: HashMap::new(),
         }
-    }
-
-    /// `NamespaceStore::default` Creates a registry of pre-registered NamespaceStore.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// use sage::vocab::NamespaceStore;
-    ///
-    /// let ns : NamespaceStore = NamespaceStore::default();
-    /// assert_eq!(ns.len(), 3);
-    /// ```
-    pub fn default() -> NamespaceStore {
-        // Use the default vocabularies.
-        use crate::vocab::{RdfVocab, RdfsVocab, SchemaVocab, Vocabulary};
-
-        // Create a new mutable namespace store.
-        let mut ns = NamespaceStore::new();
-
-        // Add the default vocabularies.
-        let ns_list: Vec<Namespace> = vec![
-            Namespace::new(&RdfVocab::prefix(), &RdfVocab::full()),
-            Namespace::new(&RdfsVocab::prefix(), &RdfsVocab::full()),
-            Namespace::new(&SchemaVocab::prefix(), &SchemaVocab::full()),
-        ];
-
-        // Add a collection of namespace objects.
-        ns.add_multiple(&ns_list);
-
-        ns
     }
 
     /// `NamespaceStore::add` adds a new namespace to the registered list.
@@ -450,6 +420,38 @@ impl NamespaceStore {
                 full: full.to_string(),
             });
         }
+        ns
+    }
+}
+
+impl Default for NamespaceStore {
+    /// `NamespaceStore::default` Creates a registry of pre-registered NamespaceStore.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use sage::vocab::NamespaceStore;
+    ///
+    /// let ns : NamespaceStore = NamespaceStore::default();
+    /// assert_eq!(ns.len(), 3);
+    /// ```
+    fn default() -> Self {
+        // Use the default vocabularies.
+        use crate::vocab::{RdfVocab, RdfsVocab, SchemaVocab, Vocabulary};
+
+        // Create a new mutable namespace store.
+        let mut ns = NamespaceStore::new();
+
+        // Add the default vocabularies.
+        let ns_list: Vec<Namespace> = vec![
+            Namespace::new(&RdfVocab::prefix(), &RdfVocab::full()),
+            Namespace::new(&RdfsVocab::prefix(), &RdfsVocab::full()),
+            Namespace::new(&SchemaVocab::prefix(), &SchemaVocab::full()),
+        ];
+
+        // Add a collection of namespace objects.
+        ns.add_multiple(&ns_list);
+
         ns
     }
 }

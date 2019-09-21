@@ -8,6 +8,8 @@
 //! These connection types all implements the `sage::graph::Connection` trait.
 //!
 
+use std::fmt;
+
 /// `Connection` trait should be implemented by every connection type.
 pub trait Connection {}
 
@@ -56,4 +58,17 @@ pub enum ConnectionType {
   /// Here, "John" has a forward relationship with those languages however the
   /// languages doesn't necessarily share a relationship with "John".
   Multiple,
+}
+
+impl fmt::Display for ConnectionType {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let conn_type: &str = match self {
+      ConnectionType::Forward => "Forward",
+      ConnectionType::Shared => "Shared",
+      ConnectionType::Relational => "Relational",
+      ConnectionType::Multiple => "Multiple",
+    };
+
+    write!(f, "{}", conn_type)
+  }
 }
