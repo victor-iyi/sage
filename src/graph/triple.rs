@@ -2,7 +2,10 @@ use std::fmt;
 
 use crate::graph::*;
 
+struct TripleID;
+
 pub struct Triple {
+  id: TripleID,
   source: Node,
   connection: ConnectionType,
   predicate: Predicate,

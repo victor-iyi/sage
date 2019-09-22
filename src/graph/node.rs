@@ -226,6 +226,7 @@ pub trait Nodeable<T> {
 
   fn node_type(&self) -> Self::ItemType;
 }
+
 #[derive(Debug)]
 struct NodeImpl {
   /// Node ID should be inform of "sg:N4236".
