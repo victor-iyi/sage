@@ -1,16 +1,24 @@
 #![allow(dead_code)]
+use std::fmt;
 use std::str::FromStr;
 
 use regex::Regex;
 
 use crate::error::{Error, ErrorCode};
 
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | Public Enums.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+ */
 /// `NodeTypes` consists of various kinds of valid nodes that is supported by the `sage` engine.
 ///
 /// **NOTE:** This is not to be misplaced for Data types or a `Node` itself.
 ///
 /// TLDR; `NodeType` represent the different forms which `Node` can exist.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum NodeType {
   /// `Blank` node containing node with empty or null data.
   Blank,
@@ -30,6 +38,7 @@ pub enum NodeType {
   Literal,
 }
 
+/// Implementation for `NodeType` enum.
 impl NodeType {
   /// Check of `NodeType` is of type `NodeType::Blank`.
   ///
@@ -119,10 +128,36 @@ impl NodeType {
     }
   }
 
+  /// Returns the `NodeType` variant.
+  ///
+  /// # Example
+  /// ```rust
+  /// use sage::graph::NodeType;
+  ///
+  /// // Assume `NodeType::Literal` was gotten dynamically.
+  /// let node_type: NodeType = NodeType::Literal;
+  ///
+  /// assert_eq!(node_type.get_type(), NodeType::Literal);
+  /// assert_eq!(NodeType::Blank.get_type(), NodeType::Blank);
+  /// ```
+  ///
   pub fn get_type(&self) -> NodeType {
-    unimplemented!()
+    match *self {
+      NodeType::Blank => NodeType::Blank,
+      NodeType::Schema => NodeType::Schema,
+      NodeType::Literal => NodeType::Literal,
+      NodeType::Http => NodeType::Http,
+    }
   }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | Public Struct(s).
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+ */
 
 /// `NodeId` is a unique identifier assigned to every node in the Knowledge Graph.
 ///
@@ -156,36 +191,60 @@ impl Iterator for NodeId {
   }
 }
 
+/// `Node` represents each *"entity"* or *"real world object"* in the Knowledge Graph.
+/// There are different variants of nodes which can be found in
+/// `NodeType` enum.
+///
+/// `Node` is the crux of a `sage` knowledge graph, in which every *"entity"*
+/// in the Knowledge Graph is regarded as a `Node` in `sage`.
+///
+/// As for the implementation of a `Node`, it has a private node implementation
+/// which is only exposed through the `Node::node` and it is boxed for memory
+/// management purposes. Higher level APIs are provided to work with `Node` as
+/// effectively and efficiently as possible.
+#[derive(Debug, Default)]
+pub struct Node {
+  node: Box<NodeImpl>,
+}
+
+impl Node {
+  pub fn new() -> Node {
+    unimplemented!()
+  }
+}
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | Public Traits.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+ */
 /// `Nodeable` trait should be implemented by every node variant.
 pub trait Nodeable<T> {
   type ItemType;
 
   fn node_type(&self) -> Self::ItemType;
 }
-
-pub struct SchemaNode {}
-
-pub struct Node {
-  node: Box<NodeImpl>,
-}
-
-impl Node {}
-
+#[derive(Debug)]
 struct NodeImpl {
   /// Node ID should be inform of "sg:N4236".
   id: String,
   // `NodeType` describes the variant of node the current node is.
-  // node_type: NodeType<T>,
+  node_type: NodeType,
 }
 
 impl NodeImpl {
-  fn new() -> NodeImpl {
+  fn new(node_type: NodeType) -> NodeImpl {
     NodeImpl {
       id: NodeId("sg:N".to_string()).next().unwrap(),
-      // node_type,
+      node_type,
     }
   }
 
+  fn id(&self) -> &str {
+    &self.id
+  }
   // fn get_data<T: Nodeable>(node_type: T) -> NodeImpl {
   //   match node_type {
   //     NodeType::Blank(_) => {}
@@ -196,6 +255,12 @@ impl NodeImpl {
 
   //   unimplemented!()
   // }
+}
+
+impl Default for NodeImpl {
+  fn default() -> Self {
+    Self::new(NodeType::Blank)
+  }
 }
 
 /// `NodeStore` consist of List of node items.
@@ -249,5 +314,12 @@ impl NodeStore {
   /// ```
   pub fn is_empty(&self) -> bool {
     self.len() == 0
+  }
+}
+
+impl fmt::Display for Node {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    // TODO(victor): Proper display for node. `Node` should be replaced with either it's type or the label of the node.
+    write!(f, "Node({})", self.node.id)
   }
 }
