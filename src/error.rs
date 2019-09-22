@@ -107,7 +107,8 @@ impl Error {
             | ErrorCode::TrailingComma
             | ErrorCode::TrailingCharacters
             | ErrorCode::UnexpectedEndOfHexEscape
-            | ErrorCode::RecursionLimitExceeded => Category::Syntax,
+            | ErrorCode::RecursionLimitExceeded
+            | ErrorCode::RegexParser => Category::Syntax,
         }
     }
 
@@ -343,6 +344,9 @@ pub enum ErrorCode {
 
     /// Encountered nesting of JSON maps and arrays more than 128 layers deep.
     RecursionLimitExceeded,
+
+    /// Could not parse regular expression pattern or pattern wasn't a match.
+    RegexParser,
 }
 
 impl Display for ErrorCode {
@@ -381,6 +385,9 @@ impl Display for ErrorCode {
             ErrorCode::TrailingCharacters => f.write_str("trailing characters"),
             ErrorCode::UnexpectedEndOfHexEscape => f.write_str("unexpected end of hex escape"),
             ErrorCode::RecursionLimitExceeded => f.write_str("recursion limit exceeded"),
+            ErrorCode::RegexParser => {
+                f.write_str("regular expression wasn't a match or malformed.")
+            }
         }
     }
 }

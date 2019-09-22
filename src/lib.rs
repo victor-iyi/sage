@@ -6,6 +6,7 @@ extern crate dotenv;
 extern crate ntriple;
 extern crate rand;
 extern crate rdf;
+extern crate regex;
 extern crate serde_json;
 extern crate uuid;
 

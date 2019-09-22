@@ -90,8 +90,8 @@ impl Namespace {
     /// // Creates a new namespace using a sing literal.
     /// let ns = Namespace::from("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
     ///
-    /// assert_eq!(ns.prefix(), &IRI::from("rdf:type"));
-    /// assert_eq!(ns.full(), &IRI::from("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"));
+    /// assert_eq!(ns.prefix(), "rdf:type");
+    /// assert_eq!(ns.full(), "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
     /// ```
     ///
     pub fn from(prefix: &str, full: &str) -> Namespace {
@@ -112,7 +112,7 @@ impl Namespace {
     /// // Creates a new namespace using a sing literal.
     /// let ns = Namespace::from("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
     ///
-    /// assert_eq!(ns.prefix(), &IRI::from("rdf:type"));
+    /// assert_eq!(ns.prefix(), "rdf:type");
     /// ```
     pub fn prefix(&self) -> &str {
         &self.prefix
@@ -129,10 +129,29 @@ impl Namespace {
     /// // Creates a new namespace using a sing literal.
     /// let ns = Namespace::from("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
     ///
-    ///  assert_eq!(ns.full(), &IRI::from("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"));
+    ///  assert_eq!(ns.full(), "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
     /// ```
     pub fn full(&self) -> &str {
         &self.full
+    }
+}
+
+impl Default for Namespace {
+    /// `Namespace::default` creates a default namespace.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use sage::types::IRI;
+    /// use sage::vocab::Namespace;
+    ///
+    /// let ns : Namespace = Namespace::default();
+    ///
+    /// assert_eq!(ns.prefix(), "schema:Thing");
+    /// assert_eq!(ns.full(), "https://schema.org/Thing");
+    /// ```
+    fn default() -> Self {
+        Namespace::new("schema:Thing", "https://schema.org/Thing")
     }
 }
 
@@ -222,8 +241,8 @@ impl NamespaceStore {
     ///
     /// // Using IRI reference.
     /// ns.add_prefix(
-    ///   &IRI::from("schema:Thing"),
-    ///   &IRI::from("https://schema.org/Thing"),
+    ///   "schema:Thing",
+    ///   "https://schema.org/Thing",
     /// );
     /// assert_eq!(ns.len(), 2);
     /// ```
