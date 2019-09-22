@@ -11,6 +11,7 @@ keywords = ["knowledge-graph", "linked-data", "sage"]
 
 [lib]
 name = "sage"
+# proc-macro = true
 
 [dependencies]
 dotenv = "0.14"
