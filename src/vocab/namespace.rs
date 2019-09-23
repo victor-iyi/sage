@@ -2,6 +2,51 @@ use crate::types::IRI;
 
 use std::collections::HashMap;
 
+/// `URI` expands and contracts a URL given it's context and the property.
+pub struct URI {
+    /// `context` for example http://schema.org which is the base URI for the node.
+    context: IRI,
+
+    /// `short` could for example be `Person`. The URI will combine
+    /// both together to form "https://schema.org/Person".
+    short: IRI,
+}
+
+impl URI {
+    /// Creates a new `URI` instance.
+    ///
+    /// ## Basic Usage
+    ///
+    /// ```rust
+    /// use sage::vocab::URI;
+    ///
+    /// let val = URI::new("https://schema.org", "Person");
+    ///
+    /// assert_eq!(val.context(), "https://schema.org");
+    /// assert_eq!(val.short(), "Person");
+    /// assert_eq!(val.expand(), "https://schema.org/Person");
+    /// ```
+    ///
+    pub fn new(context: &str, short: &str) -> URI {
+        URI {
+            context: context.to_string(),
+            short: short.to_string(),
+        }
+    }
+
+    pub fn context(&self) -> &IRI {
+        &self.context
+    }
+
+    pub fn short(&self) -> &IRI {
+        &self.short
+    }
+
+    pub fn expand(&self) -> IRI {
+        format!("{}/{}", &self.context.trim_end_matches('/'), &self.short)
+    }
+}
+
 /// Namespace is a RDF namespace (vocabulary).
 #[derive(Debug, PartialEq, Clone)]
 pub struct Namespace {
@@ -16,7 +61,7 @@ impl Namespace {
     ///
     /// ```rust
     /// use sage::types::IRI;
-    /// use sage::schema::Namespace;
+    /// use sage::vocab::Namespace;
     ///
     /// let prefix: IRI = IRI::from("rdf:type");
     /// let full: IRI = IRI::from("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
@@ -40,13 +85,13 @@ impl Namespace {
     ///
     /// ```rust
     /// use sage::types::IRI;
-    /// use sage::schema::Namespace;
+    /// use sage::vocab::Namespace;
     ///
     /// // Creates a new namespace using a sing literal.
     /// let ns = Namespace::from("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
     ///
-    /// assert_eq!(ns.prefix(), &IRI::from("rdf:type"));
-    /// assert_eq!(ns.full(), &IRI::from("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"));
+    /// assert_eq!(ns.prefix(), "rdf:type");
+    /// assert_eq!(ns.full(), "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
     /// ```
     ///
     pub fn from(prefix: &str, full: &str) -> Namespace {
@@ -62,12 +107,12 @@ impl Namespace {
     ///
     /// ```rust
     /// use sage::types::IRI;
-    /// use sage::schema::Namespace;
+    /// use sage::vocab::Namespace;
     ///
     /// // Creates a new namespace using a sing literal.
     /// let ns = Namespace::from("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
     ///
-    /// assert_eq!(ns.prefix(), &IRI::from("rdf:type"));
+    /// assert_eq!(ns.prefix(), "rdf:type");
     /// ```
     pub fn prefix(&self) -> &str {
         &self.prefix
@@ -79,20 +124,39 @@ impl Namespace {
     ///
     /// ```rust
     /// use sage::types::IRI;
-    /// use sage::schema::Namespace;
+    /// use sage::vocab::Namespace;
     ///
     /// // Creates a new namespace using a sing literal.
     /// let ns = Namespace::from("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
     ///
-    ///  assert_eq!(ns.full(), &IRI::from("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"));
+    ///  assert_eq!(ns.full(), "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
     /// ```
     pub fn full(&self) -> &str {
         &self.full
     }
 }
 
+impl Default for Namespace {
+    /// `Namespace::default` creates a default namespace.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use sage::types::IRI;
+    /// use sage::vocab::Namespace;
+    ///
+    /// let ns : Namespace = Namespace::default();
+    ///
+    /// assert_eq!(ns.prefix(), "schema:Thing");
+    /// assert_eq!(ns.full(), "https://schema.org/Thing");
+    /// ```
+    fn default() -> Self {
+        Namespace::new("schema:Thing", "https://schema.org/Thing")
+    }
+}
+
 /// `NamespaceStore` is a set of registered NamespaceStore.
-#[derive(Debug, Default, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct NamespaceStore {
     /// List of registered namespace prefix & full `IRI` values.
     prefixes: HashMap<IRI, IRI>,
@@ -104,7 +168,7 @@ impl NamespaceStore {
     /// # Example
     ///
     /// ```rust
-    /// use sage::schema::NamespaceStore;
+    /// use sage::vocab::NamespaceStore;
     ///
     /// let ns : NamespaceStore = NamespaceStore::new();
     /// assert_eq!(ns.len(), 0);
@@ -116,43 +180,13 @@ impl NamespaceStore {
         }
     }
 
-    /// `NamespaceStore::default` Creates a registry of pre-registered NamespaceStore.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// use sage::schema::NamespaceStore;
-    ///
-    /// let ns : NamespaceStore = NamespaceStore::default();
-    /// assert_eq!(ns.len(), 3);
-    /// ```
-    pub fn default() -> NamespaceStore {
-        // Use the default vocabularies.
-        use crate::vocab::{RdfVocab, RdfsVocab, SchemaVocab, Vocabulary};
-
-        // Create a new mutable namespace store.
-        let mut ns = NamespaceStore::new();
-
-        // Add the default vocabularies.
-        let ns_list: Vec<Namespace> = vec![
-            Namespace::new(&RdfVocab::prefix(), &RdfVocab::full()),
-            Namespace::new(&RdfsVocab::prefix(), &RdfsVocab::full()),
-            Namespace::new(&SchemaVocab::prefix(), &SchemaVocab::full()),
-        ];
-
-        // Add a collection of namespace objects.
-        ns.add_multiple(&ns_list);
-
-        ns
-    }
-
     /// `NamespaceStore::add` adds a new namespace to the registered list.
     ///
     /// # Example
     ///
     /// ```rust
     /// use sage::types::IRI;
-    /// use sage::schema::{Namespace, NamespaceStore};
+    /// use sage::vocab::{Namespace, NamespaceStore};
     ///
     /// // Create a Namespace store.
     /// let mut ns = NamespaceStore::new();
@@ -165,6 +199,22 @@ impl NamespaceStore {
     /// ns.add(&Namespace::from("schema:Thing", "https://schema.org/Thing"));
     /// assert_eq!(ns.len(), 2);
     /// ```
+    /// You could also use `NamespaceStore` alias -> `Namespaces`, in case you say it's too long.
+    ///
+    /// ```rust
+    /// use sage::types::IRI;
+    /// use sage::vocab::{Namespace, Namespaces};
+    ///
+    /// // Create a Namespace store.
+    /// let mut ns = Namespaces::new();
+    ///
+    /// // Add a new namespace created from `Namespace::from` API.
+    /// ns.add(&Namespace::from("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"));
+    /// assert_eq!(ns.len(), 1);
+    ///
+    ///// Let's register another namespace.
+    /// ns.add(&Namespace::from("schema:Thing", "https://schema.org/Thing"));
+    /// assert_eq!(ns.len(), 2);
     ///
     pub fn add(&mut self, ns: &Namespace) {
         self.prefixes
@@ -177,7 +227,7 @@ impl NamespaceStore {
     ///
     /// ```rust
     /// use sage::types::IRI;
-    /// use sage::schema::NamespaceStore;
+    /// use sage::vocab::NamespaceStore;
     ///
     /// // Create a mutable namespace store.
     /// let mut ns = NamespaceStore::new();
@@ -191,8 +241,8 @@ impl NamespaceStore {
     ///
     /// // Using IRI reference.
     /// ns.add_prefix(
-    ///   &IRI::from("schema:Thing"),
-    ///   &IRI::from("https://schema.org/Thing"),
+    ///   "schema:Thing",
+    ///   "https://schema.org/Thing",
     /// );
     /// assert_eq!(ns.len(), 2);
     /// ```
@@ -209,7 +259,7 @@ impl NamespaceStore {
     /// # Example
     ///
     /// ```rust
-    /// use sage::schema::{Namespace, NamespaceStore};
+    /// use sage::vocab::{Namespace, NamespaceStore};
     ///
     /// // Create a new mutable namespace store.
     /// let mut ns: NamespaceStore = NamespaceStore::new();
@@ -243,7 +293,7 @@ impl NamespaceStore {
     ///
     /// ```
     /// use sage::types::IRI;
-    /// use sage::schema::NamespaceStore;
+    /// use sage::vocab::NamespaceStore;
     ///
     /// // Create a mutable namespace store.
     /// let mut ns = NamespaceStore::new();
@@ -281,7 +331,7 @@ impl NamespaceStore {
     ///
     /// ```rust
     /// use sage::types::IRI;
-    /// use sage::schema::NamespaceStore;
+    /// use sage::vocab::NamespaceStore;
     ///
     ///   // Create a mutable namespace store.
     /// let mut ns = NamespaceStore::new();
@@ -314,7 +364,7 @@ impl NamespaceStore {
     /// # Example
     ///
     /// ```rust
-    /// use sage::schema::{Namespace, NamespaceStore};
+    /// use sage::vocab::{Namespace, NamespaceStore};
     ///
     ///     // Create a new mutable namespace store.
     /// let mut ns = NamespaceStore::new();
@@ -332,12 +382,12 @@ impl NamespaceStore {
         self.prefixes.len()
     }
 
-    /// `NamespaceStore::is_empty` returns `true` if there are no item in the `NamespaceStoretore`.
+    /// `NamespaceStore::is_empty` returns `true` if there are no item in the `NamespaceStore`.
     ///
     /// # Example
     ///
     /// ```rust
-    /// use sage::schema::{Namespace, NamespaceStore};
+    /// use sage::vocab::{Namespace, NamespaceStore};
     ///
     ///     // Create a new mutable namespace store.
     /// let mut ns = NamespaceStore::new();
@@ -361,7 +411,7 @@ impl NamespaceStore {
     /// # Example
     ///
     /// ```rust
-    /// use sage::schema::{Namespace, NamespaceStore};
+    /// use sage::vocab::{Namespace, NamespaceStore};
     ///
     ///     // Create a new mutable namespace store.
     /// let mut ns = NamespaceStore::new();
@@ -393,8 +443,40 @@ impl NamespaceStore {
     }
 }
 
-/// Alias for `Namespaces` so it won't be confused with `NamespaceStore`.
+impl Default for NamespaceStore {
+    /// `NamespaceStore::default` Creates a registry of pre-registered NamespaceStore.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use sage::vocab::NamespaceStore;
+    ///
+    /// let ns : NamespaceStore = NamespaceStore::default();
+    /// assert_eq!(ns.len(), 3);
+    /// ```
+    fn default() -> Self {
+        // Use the default vocabularies.
+        use crate::vocab::{RdfVocab, RdfsVocab, SchemaVocab, Vocabulary};
+
+        // Create a new mutable namespace store.
+        let mut ns = NamespaceStore::new();
+
+        // Add the default vocabularies.
+        let ns_list: Vec<Namespace> = vec![
+            Namespace::new(&RdfVocab::prefix(), &RdfVocab::full()),
+            Namespace::new(&RdfsVocab::prefix(), &RdfsVocab::full()),
+            Namespace::new(&SchemaVocab::prefix(), &SchemaVocab::full()),
+        ];
+
+        // Add a collection of namespace objects.
+        ns.add_multiple(&ns_list);
+
+        ns
+    }
+}
+
+/// `Namespaces` Alias for `NamespaceStore` to avoid confusion or misinterpretation.
 ///
-/// `Namespaces` and `NamespaceStore` are a collection of multiple
+/// `NamespaceStore` or `Namespaces` are a collection of multiple
 /// `Namespace`.
 pub type Namespaces = NamespaceStore;
