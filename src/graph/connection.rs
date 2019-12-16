@@ -60,6 +60,36 @@ pub enum ConnectionType {
   Multiple,
 }
 
+impl ConnectionType {
+  pub fn is_forward(&self) -> bool {
+    match *self {
+      ConnectionType::Forward => true,
+      _ => false,
+    }
+  }
+
+  pub fn is_shared(&self) -> bool {
+    match *self {
+      ConnectionType::Shared => true,
+      _ => false,
+    }
+  }
+
+  pub fn is_relational(&self) -> bool {
+    match *self {
+      ConnectionType::Relational => true,
+      _ => false,
+    }
+  }
+
+  pub fn is_multiple(&self) -> bool {
+    match *self {
+      ConnectionType::Multiple => true,
+      _ => false,
+    }
+  }
+}
+
 impl fmt::Display for ConnectionType {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let conn_type: &str = match self {
