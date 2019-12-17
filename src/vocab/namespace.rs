@@ -159,6 +159,8 @@ impl Default for Namespace {
 #[derive(Debug, PartialEq, Clone)]
 pub struct NamespaceStore {
     /// List of registered namespace prefix & full `IRI` values.
+    ///
+    /// eg. `"schema:Thing": "https://schema.org/Thing"`.
     prefixes: HashMap<IRI, IRI>,
 }
 

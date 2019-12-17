@@ -7,7 +7,7 @@ struct TripleID;
 pub struct Triple {
   id: TripleID,
   source: Node,
-  connection: ConnectionType,
+  connection: Connection,
   predicate: Predicate,
   destination: Node,
 }
