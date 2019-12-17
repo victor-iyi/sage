@@ -28,7 +28,7 @@ pub mod prelude {
   pub use crate::error::*;
 
   // Sage types & vocabularies.
-  pub use crate::types::{IRI, URI};
+  pub use crate::types::*;
   pub use crate::vocab::*;
 
   // Sage graph, nodes, connections & ...

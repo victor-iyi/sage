@@ -1,24 +1,27 @@
-#![allow(dead_code)]
 use std::fmt;
 use std::str::FromStr;
 
 use regex::Regex;
 
 use crate::error::{Error, ErrorCode};
-use crate::types::URI;
+use crate::types::{DTypes, URI};
 
 /*
  * +----------------------------------------------------------------------+
  * | +------------------------------------------------------------------+ |
- * | | Public Enums.
+ * | | Node
  * | +------------------------------------------------------------------+ |
  * +----------------------------------------------------------------------+
  */
+
 /// `Node` consists of various kinds of valid nodes that is supported by the `sage` engine.
 ///
-/// **NOTE:** This is not to be misplaced for Data types or a `Node` itself.
+/// `Node` represents each *entity* or *real world object* in the Knowledge Graph.
+/// There are different variants of nodes.
 ///
-/// TLDR; `Node` represent the different forms which `Node` can exist.
+/// `Node` is the crux of a `sage` knowledge graph, in which every *entity*
+/// in the Knowledge Graph is regarded as a `Node` in `sage`.
+///
 #[derive(Debug, PartialEq)]
 pub enum Node {
   /// `Blank` node containing node with empty or null data.
@@ -39,7 +42,7 @@ pub enum Node {
   Literal {
     literal: String,
     language: Option<String>,
-    dtype: Option<String>,
+    dtype: Option<DTypes>,
   },
 }
 
@@ -166,9 +169,24 @@ impl Node {
   }
 }
 
+impl fmt::Display for Node {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    // TODO(victor): Proper display for node. `Node` should be replaced with either it's type or the label of the node.
+    write!(f, "{}", self.get_type())
+  }
+}
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | NodeId
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+ */
 /// `NodeId` is a unique identifier assigned to every node in the Knowledge Graph.
 ///
 ///`NodeId` comes in form of `"sg:N4286"`.
+#[derive(Debug)]
 pub struct NodeId(String);
 
 impl FromStr for NodeId {
@@ -187,58 +205,30 @@ impl FromStr for NodeId {
 }
 
 impl Iterator for NodeId {
-  type Item = String;
+  type Item = NodeId;
 
   /// The generates new `NodeId` each time a new node is created.
-  fn next(&mut self) -> Option<String> {
+  fn next(&mut self) -> Option<NodeId> {
     let mut counter: u64 = 0;
     counter += 1;
     let ret = format!("{}{}", self.0, counter);
-    Some(ret)
+    Some(NodeId::from_str(&ret).unwrap())
+  }
+}
+
+impl fmt::Display for NodeId {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{}", self.0)
   }
 }
 
 /*
  * +----------------------------------------------------------------------+
  * | +------------------------------------------------------------------+ |
- * | | Public Traits.
+ * | | NodeStore
  * | +------------------------------------------------------------------+ |
  * +----------------------------------------------------------------------+
  */
-/// `Nodeable` trait should be implemented by every node variant.
-pub trait Nodeable<T> {
-  type ItemType;
-
-  fn node_type(&self) -> Self::ItemType;
-}
-
-#[derive(Debug)]
-struct NodeImpl {
-  /// Node ID should be inform of "sg:N4236".
-  id: String,
-  // `Node` describes the variant of node the current node is.
-  node_type: Node,
-}
-
-impl NodeImpl {
-  fn new(node_type: Node) -> NodeImpl {
-    NodeImpl {
-      id: NodeId("sg:N".to_string()).next().unwrap(),
-      node_type,
-    }
-  }
-
-  fn id(&self) -> &str {
-    &self.id
-  }
-}
-
-impl Default for NodeImpl {
-  fn default() -> Self {
-    Self::new(Node::Blank)
-  }
-}
-
 /// `NodeStore` consist of List of node items.
 #[derive(Default)]
 pub struct NodeStore {
@@ -293,15 +283,42 @@ impl NodeStore {
   }
 }
 
-impl fmt::Display for Node {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    // TODO(victor): Proper display for node. `Node` should be replaced with either it's type or the label of the node.
-    write!(f, "{}", self.get_type())
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | NodeImpl
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+ */
+#[derive(Debug)]
+struct NodeImpl {
+  /// Node ID should be inform of "sg:N4236".
+  id: NodeId,
+  // `Node` describes the variant of node the current node is.
+  node_type: Node,
+}
+
+impl NodeImpl {
+  fn new(node_type: Node) -> NodeImpl {
+    NodeImpl {
+      id: NodeId("sg:N".to_string()).next().unwrap(),
+      node_type,
+    }
+  }
+
+  fn id(&self) -> &str {
+    &self.id.0
+  }
+}
+
+impl Default for NodeImpl {
+  fn default() -> Self {
+    Self::new(Node::Blank)
   }
 }
 
 /*
-/// `Node` represents each *"entity"* or *"real world object"* in the Knowledge Graph.
+/// `Entity` represents each *real world object* in the Knowledge Graph.
 /// There are different variants of nodes which can be found in
 /// `Node` enum.
 ///
@@ -313,13 +330,15 @@ impl fmt::Display for Node {
 /// management purposes. Higher level APIs are provided to work with `Node` as
 /// effectively and efficiently as possible.
 #[derive(Debug, Default)]
-pub struct Node {
+pub struct Entity {
   node: Box<NodeImpl>,
 }
 
-impl Node {
-  pub fn new() -> Node {
-    unimplemented!()
+impl Entity {
+  pub fn new(dtype: Node) -> Entity {
+    Entity {
+      node: Box::new(NodeImpl::new(dtype)),
+    }
   }
 }
 */
