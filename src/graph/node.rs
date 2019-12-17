@@ -143,35 +143,19 @@ impl Node {
   /// # Example
   /// ```rust
   /// use sage::graph::Node;
+  /// use sage::types::DTypes;
   ///
   /// // Assume `Node::Literal` was gotten dynamically.
   ///
-  /// assert_eq!(Node::Blank.get_type(), Node::Blank);
+  /// assert_eq!(Node::Blank.get_type(), &Node::Blank);
+  /// let john : Node = Node::Literal{ literal: "John Doe".to_string(), language: None, dtype: None };
+  /// assert_eq!(john.get_type(), &john);
+  ///
   /// ```
   ///
-  pub fn get_type(&self) -> Node {
+  pub fn get_type(&self) -> &Node {
     match &*self {
-      Node::Blank => Node::Blank,
-
-      Node::Schema => Node::Schema,
-
-      Node::Literal {
-        literal,
-        language,
-        dtype,
-      } => Node::Literal {
-        literal: literal.to_string(),
-        language: if let Some(lang) = language {
-          Some(lang.to_string())
-        } else {
-          None
-        },
-        dtype: dtype.clone(),
-      },
-
-      Node::Http { uri } => Node::Http {
-        uri: uri.to_string(),
-      },
+      node_type => node_type,
     }
   }
 }

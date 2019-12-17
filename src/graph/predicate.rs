@@ -127,14 +127,12 @@ impl Predicate {
   /// use sage::vocab::Namespace;
   ///
   /// let pred : Predicate = Predicate::Uri(Namespace::default());
-  /// assert_eq!(pred.get_type(), Predicate::Uri(Namespace::default()));
+  /// assert_eq!(pred.get_type(), &Predicate::Uri(Namespace::default()));
   /// ```
   ///
-  pub fn get_type(&self) -> Predicate {
+  pub fn get_type(&self) -> &Predicate {
     match &*self {
-      Predicate::Literal(lit) => Predicate::Literal(lit.to_string()),
-      // FIXME(victor): Fix cloning of the `Namespace` object.
-      Predicate::Uri(uri) => Predicate::Uri(uri.clone()),
+      pred_type => pred_type,
     }
   }
 }
