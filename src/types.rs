@@ -10,7 +10,7 @@ pub type IRI = String;
 /// `URI` is used to represent any URL-like `IRI`.
 pub type URI = String;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum DTypes {
   Boolean(bool),
   Text(String),

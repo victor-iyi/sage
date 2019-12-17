@@ -155,14 +155,21 @@ impl Node {
 
       Node::Schema => Node::Schema,
 
-      Node::Literal { literal, .. } => Node::Literal {
+      Node::Literal {
+        literal,
+        language,
+        dtype,
+      } => Node::Literal {
         literal: literal.to_string(),
-        language: None,
-        dtype: None,
+        language: if let Some(lang) = language {
+          Some(lang.to_string())
+        } else {
+          None
+        },
+        dtype: dtype.clone(),
       },
 
       Node::Http { uri } => Node::Http {
-        // FIXME(victor-iyiola): It might be wrong to do this, but it works for now.
         uri: uri.to_string(),
       },
     }
@@ -171,7 +178,6 @@ impl Node {
 
 impl fmt::Display for Node {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    // TODO(victor): Proper display for node. `Node` should be replaced with either it's type or the label of the node.
     write!(f, "{}", self.get_type())
   }
 }
