@@ -31,10 +31,11 @@ pub mod prelude {
   pub use crate::types::*;
   pub use crate::vocab::*;
 
-  // Sage graph, nodes, connections & ...
+  // Sage graphs, nodes, connections, predicates & triples.
   pub use crate::graph::*;
 
-  // Sage namespace & namespace store.
+  // Sage schemas. Files and data sage can work with.
+  // Example: jsonld, rdf, wikidata, etc.
   pub use crate::schema::*;
 }
 
