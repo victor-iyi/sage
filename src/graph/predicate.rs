@@ -37,7 +37,7 @@ impl FromStr for PredicateId {
     if re.is_match(s) {
       Ok(PredicateId(String::from(s)))
     } else {
-      Err(Error::syntax(ErrorCode::RegexParser, 49, 25))
+      Err(Error::syntax(ErrorCode::RegexParser, 37, 8))
     }
   }
 }

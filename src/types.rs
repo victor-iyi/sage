@@ -3,6 +3,7 @@
 //! native rust because they include extended functionalities and can also be dereferenced
 //!  back and forth into native Rust types  like [Strings](https://doc.rust-lang.org/stable/alloc/string/struct.String.html) and sage types.
 //!
+use std::fmt;
 
 /// `IRI` stands for International Resource Identifer. (ex: <name>).
 pub type IRI = String;
@@ -23,6 +24,17 @@ pub enum DTypes {
 enum Number {
   Float(f64),
   Integer(isize),
+}
+
+impl fmt::Display for DTypes {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    match &*self {
+      DTypes::Boolean(b) => write!(f, "{}", b),
+      DTypes::Text(t) => write!(f, "{}", t),
+      // For every other variant, use the Debug trait.
+      _ => fmt::Debug::fmt(self, f),
+    }
+  }
 }
 
 /*
