@@ -6,7 +6,7 @@ edition = "2018"
 license = "Apache-2.0"
 description = "Provides the CLI for the Sage crate"
 readme = "README.md"
-repository = "https://github.com/victor-iyiola/rust-sage"
+repository = "https://github.com/victor-iyiola/sage"
 keywords = ["knowledge-graph", "linked-data", "sage", "cli"]
 autotests = false
 
