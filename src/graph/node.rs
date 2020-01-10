@@ -1,25 +1,29 @@
-#![allow(dead_code)]
 use std::fmt;
 use std::str::FromStr;
 
 use regex::Regex;
 
 use crate::error::{Error, ErrorCode};
+use crate::types::{DTypes, URI};
 
 /*
  * +----------------------------------------------------------------------+
  * | +------------------------------------------------------------------+ |
- * | | Public Enums.
+ * | | Node
  * | +------------------------------------------------------------------+ |
  * +----------------------------------------------------------------------+
  */
-/// `NodeTypes` consists of various kinds of valid nodes that is supported by the `sage` engine.
+
+/// `Node` consists of various kinds of valid nodes that is supported by the `sage` engine.
 ///
-/// **NOTE:** This is not to be misplaced for Data types or a `Node` itself.
+/// `Node` represents each *entity* or *real world object* in the Knowledge Graph.
+/// There are different variants of nodes.
 ///
-/// TLDR; `NodeType` represent the different forms which `Node` can exist.
+/// `Node` is the crux of a `sage` knowledge graph, in which every *entity*
+/// in the Knowledge Graph is regarded as a `Node` in `sage`.
+///
 #[derive(Debug, PartialEq)]
-pub enum NodeType {
+pub enum Node {
   /// `Blank` node containing node with empty or null data.
   Blank,
 
@@ -30,138 +34,149 @@ pub enum NodeType {
   /// `Http` node is used to represent data coming from an external/http source.
   /// And example of such [James Cameron](https://www.wikidata.org/wiki/Q42574)
   /// node gotten from [wikidata](https://www.wikidata.org/wiki/Wikidata:Main_Page).
-  Http,
+  Http { uri: URI },
 
   /// `Literal` node is used to represent nodes with primitive types
   /// like `Strings`, `Numbers`, `Date`, `Time`, `DateTime` etc.
   /// which contains no extra data associated to this node.
-  Literal,
+  Literal {
+    literal: String,
+    language: Option<String>,
+    dtype: Option<DTypes>,
+  },
 }
 
-/// Implementation for `NodeType` enum.
-impl NodeType {
-  /// Check of `NodeType` is of type `NodeType::Blank`.
+/// Implementation for `Node` enum.
+impl Node {
+  /// Check of `Node` is of type `Node::Blank`.
   ///
   /// # Example
   ///
   /// ```rust
-  /// use sage::graph::NodeType;
+  /// use sage::graph::Node;
+  /// use sage::types::URI;
   ///
-  /// let node_type = NodeType::Blank;
+  /// let node_type = Node::Blank;
   /// assert_eq!(node_type.is_blank(), true);
   ///
-  /// assert_eq!(NodeType::Schema.is_blank(), false);
-  /// assert_eq!(NodeType::Http.is_blank(), false);
+  /// assert_eq!(Node::Schema.is_blank(), false);
+  /// assert_eq!(Node::Http{ uri: URI::from("https://schema.org/Person")}.is_blank(), false);
   ///
   /// ```
   ///
   pub fn is_blank(&self) -> bool {
     match *self {
-      NodeType::Blank => true,
+      Node::Blank => true,
       _ => false,
     }
   }
 
-  /// Check if `NodeType` is of type `NodeType::Schema`.
+  /// Check if `Node` is of type `Node::Schema`.
   ///
   /// # Example
   ///
   /// ```rust
-  /// use sage::graph::NodeType;
+  /// use sage::graph::Node;
+  /// use sage::types::URI;
   ///
-  /// let node_type = NodeType::Schema;
+  /// let node_type = Node::Schema;
   /// assert_eq!(node_type.is_schema(), true);
   ///
-  /// assert_eq!(NodeType::Literal.is_schema(), false);
-  /// assert_eq!(NodeType::Http.is_schema(), false);
+  /// assert_eq!(Node::Http{ uri: URI::from("https://schema.org/Person") }.is_schema(), false);
   ///
   /// ```
   ///
   pub fn is_schema(&self) -> bool {
     match *self {
-      NodeType::Schema => true,
+      Node::Schema => true,
       _ => false,
     }
   }
 
-  /// Check if `NodeType` is of type `NodeType::Http`.
+  /// Check if `Node` is of type `Node::Http`.
   ///
   /// # Example
   ///
   /// ```rust
-  /// use sage::graph::NodeType;
+  /// use sage::graph::Node;
+  /// use sage::types::URI;
   ///
-  /// let node_type = NodeType::Http;
+  /// let node_type = Node::Http{ uri: URI::from("https://schema.org/Person")};
   /// assert_eq!(node_type.is_http(), true);
   ///
-  /// assert_eq!(NodeType::Blank.is_http(), false);
-  /// assert_eq!(NodeType::Schema.is_http(), false);
+  /// assert_eq!(Node::Blank.is_http(), false);
+  /// assert_eq!(Node::Schema.is_http(), false);
   ///
   /// ```
   ///
   pub fn is_http(&self) -> bool {
     match *self {
-      NodeType::Http => true,
+      Node::Http { .. } => true,
       _ => false,
     }
   }
 
-  /// Check if `NodeType` is of type `NodeType::Literal`.
+  /// Check if `Node` is of type `Node::Literal`.
   ///
   /// # Example
   ///
   /// ```rust
-  /// use sage::graph::NodeType;
+  /// use sage::graph::Node;
   ///
-  /// let node_type = NodeType::Literal;
+  /// let node_type = Node::Literal{ literal: "John Doe".to_string(), language: None, dtype: None};
   /// assert_eq!(node_type.is_literal(), true);
   ///
-  /// assert_eq!(NodeType::Blank.is_literal(), false);
-  /// assert_eq!(NodeType::Schema.is_literal(), false);
+  /// assert_eq!(Node::Blank.is_literal(), false);
+  /// assert_eq!(Node::Schema.is_literal(), false);
   ///
   /// ```
   ///
   pub fn is_literal(&self) -> bool {
     match *self {
-      NodeType::Literal => true,
+      Node::Literal { .. } => true,
       _ => false,
     }
   }
 
-  /// Returns the `NodeType` variant.
+  /// Returns the `Node` variant.
   ///
   /// # Example
   /// ```rust
-  /// use sage::graph::NodeType;
+  /// use sage::graph::Node;
+  /// use sage::types::DTypes;
   ///
-  /// // Assume `NodeType::Literal` was gotten dynamically.
-  /// let node_type: NodeType = NodeType::Literal;
+  /// // Assume `Node::Literal` was gotten dynamically.
   ///
-  /// assert_eq!(node_type.get_type(), NodeType::Literal);
-  /// assert_eq!(NodeType::Blank.get_type(), NodeType::Blank);
+  /// assert_eq!(Node::Blank.get_type(), &Node::Blank);
+  /// let john : Node = Node::Literal{ literal: "John Doe".to_string(), language: None, dtype: None };
+  /// assert_eq!(john.get_type(), &john);
+  ///
   /// ```
   ///
-  pub fn get_type(&self) -> NodeType {
-    match *self {
-      NodeType::Blank => NodeType::Blank,
-      NodeType::Schema => NodeType::Schema,
-      NodeType::Literal => NodeType::Literal,
-      NodeType::Http => NodeType::Http,
+  pub fn get_type(&self) -> &Node {
+    match &*self {
+      node_type => node_type,
     }
+  }
+}
+
+impl fmt::Display for Node {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{}", self.get_type())
   }
 }
 
 /*
  * +----------------------------------------------------------------------+
  * | +------------------------------------------------------------------+ |
- * | | Public Struct(s).
+ * | | NodeId
  * | +------------------------------------------------------------------+ |
  * +----------------------------------------------------------------------+
  */
-
 /// `NodeId` is a unique identifier assigned to every node in the Knowledge Graph.
 ///
 ///`NodeId` comes in form of `"sg:N4286"`.
+#[derive(Debug)]
 pub struct NodeId(String);
 
 impl FromStr for NodeId {
@@ -174,96 +189,36 @@ impl FromStr for NodeId {
     if re.is_match(s) {
       Ok(NodeId(String::from(s)))
     } else {
-      Err(Error::syntax(ErrorCode::RegexParser, 49, 25))
+      Err(Error::syntax(ErrorCode::RegexParser, 189, 9))
     }
   }
 }
 
 impl Iterator for NodeId {
-  type Item = String;
+  type Item = NodeId;
 
   /// The generates new `NodeId` each time a new node is created.
-  fn next(&mut self) -> Option<String> {
+  fn next(&mut self) -> Option<NodeId> {
     let mut counter: u64 = 0;
     counter += 1;
     let ret = format!("{}{}", self.0, counter);
-    Some(ret)
+    Some(NodeId::from_str(&ret).unwrap())
   }
 }
 
-/// `Node` represents each *"entity"* or *"real world object"* in the Knowledge Graph.
-/// There are different variants of nodes which can be found in
-/// `NodeType` enum.
-///
-/// `Node` is the crux of a `sage` knowledge graph, in which every *"entity"*
-/// in the Knowledge Graph is regarded as a `Node` in `sage`.
-///
-/// As for the implementation of a `Node`, it has a private node implementation
-/// which is only exposed through the `Node::node` and it is boxed for memory
-/// management purposes. Higher level APIs are provided to work with `Node` as
-/// effectively and efficiently as possible.
-#[derive(Debug, Default)]
-pub struct Node {
-  node: Box<NodeImpl>,
-}
-
-impl Node {
-  pub fn new() -> Node {
-    unimplemented!()
+impl fmt::Display for NodeId {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{}", self.0)
   }
 }
 
 /*
  * +----------------------------------------------------------------------+
  * | +------------------------------------------------------------------+ |
- * | | Public Traits.
+ * | | NodeStore
  * | +------------------------------------------------------------------+ |
  * +----------------------------------------------------------------------+
  */
-/// `Nodeable` trait should be implemented by every node variant.
-pub trait Nodeable<T> {
-  type ItemType;
-
-  fn node_type(&self) -> Self::ItemType;
-}
-
-#[derive(Debug)]
-struct NodeImpl {
-  /// Node ID should be inform of "sg:N4236".
-  id: String,
-  // `NodeType` describes the variant of node the current node is.
-  node_type: NodeType,
-}
-
-impl NodeImpl {
-  fn new(node_type: NodeType) -> NodeImpl {
-    NodeImpl {
-      id: NodeId("sg:N".to_string()).next().unwrap(),
-      node_type,
-    }
-  }
-
-  fn id(&self) -> &str {
-    &self.id
-  }
-  // fn get_data<T: Nodeable>(node_type: T) -> NodeImpl {
-  //   match node_type {
-  //     NodeType::Blank(_) => {}
-  //     NodeType::Schema(val) => val,
-  //     NodeType::Http(val) => val,
-  //     NodeType::Literal(val) => val,
-  //   }
-
-  //   unimplemented!()
-  // }
-}
-
-impl Default for NodeImpl {
-  fn default() -> Self {
-    Self::new(NodeType::Blank)
-  }
-}
-
 /// `NodeStore` consist of List of node items.
 #[derive(Default)]
 pub struct NodeStore {
@@ -318,9 +273,62 @@ impl NodeStore {
   }
 }
 
-impl fmt::Display for Node {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    // TODO(victor): Proper display for node. `Node` should be replaced with either it's type or the label of the node.
-    write!(f, "Node({})", self.node.id)
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | NodeImpl
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+ */
+#[derive(Debug)]
+struct NodeImpl {
+  /// Node ID should be inform of "sg:N4236".
+  id: NodeId,
+  // `Node` describes the variant of node the current node is.
+  node_type: Node,
+}
+
+impl NodeImpl {
+  fn new(node_type: Node) -> NodeImpl {
+    NodeImpl {
+      id: NodeId("sg:N".to_string()).next().unwrap(),
+      node_type,
+    }
+  }
+
+  fn id(&self) -> &str {
+    &self.id.0
   }
 }
+
+impl Default for NodeImpl {
+  fn default() -> Self {
+    Self::new(Node::Blank)
+  }
+}
+
+/*
+/// `Entity` represents each *real world object* in the Knowledge Graph.
+/// There are different variants of nodes which can be found in
+/// `Node` enum.
+///
+/// `Node` is the crux of a `sage` knowledge graph, in which every *"entity"*
+/// in the Knowledge Graph is regarded as a `Node` in `sage`.
+///
+/// As for the implementation of a `Node`, it has a private node implementation
+/// which is only exposed through the `Node::node` and it is boxed for memory
+/// management purposes. Higher level APIs are provided to work with `Node` as
+/// effectively and efficiently as possible.
+#[derive(Debug, Default)]
+pub struct Entity {
+  node: Box<NodeImpl>,
+}
+
+impl Entity {
+  pub fn new(dtype: Node) -> Entity {
+    Entity {
+      node: Box::new(NodeImpl::new(dtype)),
+    }
+  }
+}
+*/

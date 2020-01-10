@@ -1,4 +1,4 @@
-//!  ## ConnectionTypes
+//!  ## Connections
 //!
 //! - Forward connection
 //! - Shared connection
@@ -10,16 +10,18 @@
 
 use std::fmt;
 
+/*
 /// `Connection` trait should be implemented by every connection type.
 pub trait Connection {}
+*/
 
 /// `sage` represents real world information in a graph-like structure.
 /// It does this through building up connections among entities. This
-/// connections are named `ConnectionType` abd consists of many variants.
+/// connections are named `Connection` abd consists of many variants.
 /// Here are some possible connections that can occur among entities
 /// (or nodes) in the graph.
 #[derive(Debug)]
-pub enum ConnectionType {
+pub enum Connection {
   /// *Forward Connection* connects two nodes together at a time.
   /// This connection might occur multiple times.
   ///
@@ -60,13 +62,43 @@ pub enum ConnectionType {
   Multiple,
 }
 
-impl fmt::Display for ConnectionType {
+impl Connection {
+  pub fn is_forward(&self) -> bool {
+    match *self {
+      Connection::Forward => true,
+      _ => false,
+    }
+  }
+
+  pub fn is_shared(&self) -> bool {
+    match *self {
+      Connection::Shared => true,
+      _ => false,
+    }
+  }
+
+  pub fn is_relational(&self) -> bool {
+    match *self {
+      Connection::Relational => true,
+      _ => false,
+    }
+  }
+
+  pub fn is_multiple(&self) -> bool {
+    match *self {
+      Connection::Multiple => true,
+      _ => false,
+    }
+  }
+}
+
+impl fmt::Display for Connection {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let conn_type: &str = match self {
-      ConnectionType::Forward => "Forward",
-      ConnectionType::Shared => "Shared",
-      ConnectionType::Relational => "Relational",
-      ConnectionType::Multiple => "Multiple",
+      Connection::Forward => "Forward",
+      Connection::Shared => "Shared",
+      Connection::Relational => "Relational",
+      Connection::Multiple => "Multiple",
     };
 
     write!(f, "{}", conn_type)
