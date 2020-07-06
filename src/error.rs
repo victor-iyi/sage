@@ -393,15 +393,16 @@ impl Display for ErrorCode {
 }
 
 impl error::Error for Error {
-    fn description(&self) -> &str {
-        match self.err.code {
-            ErrorCode::Io(ref err) => error::Error::description(err),
-            _ => {
-                // If you want a better message, use Display::fmt or to_string().
-                "Sage error"
-            }
-        }
-    }
+    // Deprecated! Use Display impl or to_string()
+    // fn description(&self) -> &str {
+    //     match self.err.code {
+    //         ErrorCode::Io(ref err) => error::Error::description(err),
+    //         _ => {
+    //             // If you want a better message, use Display::fmt or to_string().
+    //             "Sage error"
+    //         }
+    //     }
+    // }
 
     fn cause(&self) -> Option<&dyn error::Error> {
         match self.err.code {

@@ -154,9 +154,7 @@ impl Node {
   /// ```
   ///
   pub fn get_type(&self) -> &Node {
-    match &*self {
-      node_type => node_type,
-    }
+    &*self
   }
 }
 
