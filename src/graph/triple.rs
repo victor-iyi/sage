@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use regex::Regex;
 use std::fmt;
 use std::str::FromStr;
@@ -5,8 +7,21 @@ use std::str::FromStr;
 use crate::error::{Error, ErrorCode};
 use crate::graph::*;
 
-#[derive(Debug)]
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | Triple ID
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+ */
+#[derive(Debug, Eq)]
 pub struct TripleId(String);
+
+impl PartialEq for TripleId {
+  fn eq(&self, other: &TripleId) -> bool {
+    self.0 == other.0
+  }
+}
 
 impl FromStr for TripleId {
   type Err = Error;
@@ -18,7 +33,7 @@ impl FromStr for TripleId {
     if re.is_match(s) {
       Ok(TripleId(String::from(s)))
     } else {
-      Err(Error::syntax(ErrorCode::RegexParser, 49, 25))
+      Err(Error::syntax(ErrorCode::RegexParser, 22, 27))
     }
   }
 }
@@ -41,6 +56,13 @@ impl fmt::Display for TripleId {
   }
 }
 
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | Triple
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+ */
 pub struct Triple {
   id: TripleId,
   source: Node,
@@ -59,6 +81,22 @@ impl Triple {
       connection: Connection::Forward,
     }
   }
+
+  #[doc(hidden)]
+  pub fn id(&self) -> &TripleId {
+    &self.id
+  }
+
+  #[doc(hidden)]
+  pub fn connection(&self) -> &Connection {
+    &self.connection
+  }
+}
+
+impl PartialEq for Triple {
+  fn eq(&self, other: &Triple) -> bool {
+    self.id == other.id
+  }
 }
 
 impl Default for Triple {
@@ -69,13 +107,34 @@ impl Default for Triple {
   }
 }
 
-// TODO(victor): impl std::fmt::Display for Triple.
 impl fmt::Display for Triple {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(
-      f,
-      "{} {} -- {} -> {} ({})",
-      self.id, self.source, self.predicate, self.destination, self.connection
-    )
+    match self.connection() {
+      Connection::Forward => write!(
+        f,
+        "{} \"{}\" -- {} -> \"{}\"",
+        self.id, self.source, self.predicate, self.destination
+      ),
+      Connection::Multiple => write!(
+        f,
+        "{} \"{}\" -- {} -> {:?}",
+        self.id, self.source, self.predicate, self.destination
+      ),
+      Connection::Relational => write!(
+        f,
+        "{} \"{}\" -- {} -> \"{}\"",
+        self.id, self.source, self.predicate, self.destination
+      ),
+      Connection::Shared => write!(
+        f,
+        "{} \"{}\" <-- {} -> \"{}\"",
+        self.id, self.source, self.predicate, self.destination
+      ),
+    }
+    // write!(
+    //   f,
+    //   "{} {} -- {} -> {} ({})",
+    //   self.id, self.source, self.predicate, self.destination, self.connection
+    // )
   }
 }

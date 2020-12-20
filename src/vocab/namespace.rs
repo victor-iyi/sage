@@ -289,7 +289,7 @@ impl NamespaceStore {
 
     /// `NamespaceStore::short_IRI` replaces a base IRI of a known vocabulary with it's prefix.
     ///
-    ///	short_iri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") // returns "rdf:type"
+    /// short_iri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") // returns "rdf:type"
     ///
     /// # Example
     ///
@@ -327,7 +327,7 @@ impl NamespaceStore {
 
     /// `NamespaceStore::full_IRI` replaces known prefix in IRI with it's full vocabulary `IRI`.
     ///
-    ///	full_iri("rdf:type") // returns "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+    /// full_iri("rdf:type") // returns "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
     ///
     /// # Example
     ///

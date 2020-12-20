@@ -100,7 +100,6 @@ impl fmt::Display for Connection {
       Connection::Relational => "Relational",
       Connection::Multiple => "Multiple",
     };
-
-    write!(f, "{}", conn_type)
+    f.write_str(conn_type)
   }
 }

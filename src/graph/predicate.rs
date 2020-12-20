@@ -131,9 +131,7 @@ impl Predicate {
   /// ```
   ///
   pub fn get_type(&self) -> &Predicate {
-    match &*self {
-      pred_type => pred_type,
-    }
+    &*self
   }
 }
 
