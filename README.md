@@ -22,8 +22,13 @@ It comprises of varieties of features that makes it stand out amongst other
 
 [Knowledge Graph]: https://en.wikipedia.org/wiki/Knowledge_Graph
 
+<!-- GitHub Actions -->
+![CI](https://github.com/victor-iyi/sage/workflows/CI/badge.svg)
+![Audit](https://github.com/victor-iyi/sage/workflows/Audit/badge.svg)
+<!-- External CI/CD  -->
 [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/thp1gfpmipj12uxm?svg=true)](https://ci.appveyor.com/project/victor-iyi/sage)
 [![Travis Build Status](https://travis-ci.org/victor-iyi/sage.svg?branch=master)](https://travis-ci.org/victor-iyi/sage)
+<!-- Img shields -->
 [![GitHub issues](https://img.shields.io/github/issues/victor-iyi/sage)](https://github.com/victor-iyi/sage/issues)
 [![License Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
 

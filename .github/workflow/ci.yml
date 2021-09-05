@@ -1,0 +1,217 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.rust == 'nightly' }}
+    strategy:
+      matrix:
+        rust: [stable, nightly]
+
+    steps:
+      - name: Checkout the source code
+        uses: actions/checkout@master
+        with:
+          fetch-depth: 1
+
+      - name: Install Rust toolchain
+        id: install
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          profile: minimal
+          override: true
+
+      - name: Install cargo-sweep
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: cargo-sweep
+
+      - name: Cache directories
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/bin
+            ~/.cargo/git
+          key: cargo-test-dirs-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: cargo-test-dirs-
+
+      - name: Cache build
+        uses: actions/cache@v2
+        with:
+          path: target
+          key: cargo-test-build-${{ steps.install.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            cargo-test-build-${{ steps.install.outputs.rustc_hash }}-
+            cargo-test-build-
+      - name: Register artifacts
+        uses: actions-rs/cargo@v1
+        with:
+          command: sweep
+          args: --stamp
+
+      - name: Build without default features
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --no-default-features --workspace
+
+      - name: Build sage with all features
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --all-features --workspace
+
+      - name: Execute tests for all crates in the workspace
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --workspace
+
+      - name: Clean unused artifacts
+        uses: actions-rs/cargo@v1
+        with:
+          command: sweep
+          args: --file
+
+  doc:
+    name: Deploy Docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the source code
+        uses: actions/checkout@master
+
+      - name: Install Rust toolchain and component
+        id: install
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Build documentation for all crates in the workspace
+        uses: actions-rs/cargo@v1
+        with:
+          command: doc
+          args: --workspace --document-private-items --no-deps
+
+      - name: Upload documentation to GitHub Pages
+        run: |
+          touch target/doc/.nojekyll
+          curl -LsSf https://raw.githubusercontent.com/rust-lang/simpleinfra/master/setup-deploy-keys/src/deploy.rs | rustc - -o /tmp/deploy
+          (cd target/doc && /tmp/deploy)
+        env:
+          GITHUB_DEPLOY_KEY: ${{ secrets.GITHUB_DEPLOY_KEY }}
+        if: matrix.rust == 'stable' && github.ref == 'refs/heads/master'
+
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the source code
+        uses: actions/checkout@master
+
+      - name: Install Rust toolchain
+        id: install
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+          components: rustfmt
+
+      - name: Check formatting of all crates in the workspace
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the source code
+        uses: actions/checkout@master
+
+      - name: Install Rust toolchain and component
+        id: install
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: clippy
+
+      - name: Clean artifacts
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: cargo-sweep
+
+      - name: Cache directories
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/bin
+            ~/.cargo/git
+          key: cargo-clippy-dirs-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: cargo-clippy-dirs-
+
+      - name: Cache build
+        uses: actions/cache@v2
+        with:
+          path: target
+          key: cargo-clippy-${{ steps.install.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            cargo-clippy-${{ steps.install.outputs.rustc_hash }}-
+            cargo-clippy-
+      - name: Register artifacts
+        uses: actions-rs/cargo@v1
+        with:
+          command: sweep
+          args: --stamp
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --all-targets --workspace
+
+      - name: Clean unused artifacts
+        uses: actions-rs/cargo@v1
+        with:
+          command: sweep
+          args: --file
+
+  end-success:
+    name: bors build finished
+    if: success()
+    runs-on: ubuntu-latest
+    needs: [test, fmt, clippy]
+
+    steps:
+      - name: Mark the job as successful
+        run: exit 0
+
+  end-failure:
+    name: bors build finished
+    if: "!success()"
+    runs-on: ubuntu-latest
+    needs: [test, fmt, clippy]
+
+    steps:
+      - name: Mark the job as a failure
+        run: exit 1
