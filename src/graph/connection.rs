@@ -78,31 +78,19 @@ pub enum Connection {
 
 impl Connection {
   pub fn is_forward(&self) -> bool {
-    match *self {
-      Connection::Forward => true,
-      _ => false,
-    }
+    matches!(*self, Connection::Forward)
   }
 
   pub fn is_shared(&self) -> bool {
-    match *self {
-      Connection::Shared => true,
-      _ => false,
-    }
+    matches!(*self, Connection::Shared)
   }
 
   pub fn is_relational(&self) -> bool {
-    match *self {
-      Connection::Relational => true,
-      _ => false,
-    }
+    matches!(*self, Connection::Relational)
   }
 
   pub fn is_multiple(&self) -> bool {
-    match *self {
-      Connection::Multiple => true,
-      _ => false,
-    }
+    matches!(*self, Connection::Multiple)
   }
 }
 

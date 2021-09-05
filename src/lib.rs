@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! `Sage is an open source [Knowledge Graph] used to represent linked-data.
+//! It comprises of varieties of features that makes it stand out amongst other
+//! (open source) Knowledge Graphs.
+//!
+//! [Knowledge Graph]: https://en.wikipedia.org/wiki/Knowledge_Graph
+
 mod datastore;
 pub mod error;
 pub mod graph;

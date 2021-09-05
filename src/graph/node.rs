@@ -81,10 +81,7 @@ impl Node {
   /// ```
   ///
   pub fn is_blank(&self) -> bool {
-    match *self {
-      Node::Blank => true,
-      _ => false,
-    }
+    matches!(*self, Node::Blank)
   }
 
   /// Check if `Node` is of type `Node::Schema`.
@@ -103,10 +100,7 @@ impl Node {
   /// ```
   ///
   pub fn is_schema(&self) -> bool {
-    match *self {
-      Node::Schema => true,
-      _ => false,
-    }
+    matches!(*self, Node::Schema)
   }
 
   /// Check if `Node` is of type `Node::Http`.
@@ -126,10 +120,7 @@ impl Node {
   /// ```
   ///
   pub fn is_http(&self) -> bool {
-    match *self {
-      Node::Http { .. } => true,
-      _ => false,
-    }
+    matches!(*self, Node::Http { .. })
   }
 
   /// Check if `Node` is of type `Node::Literal`.
@@ -148,10 +139,11 @@ impl Node {
   /// ```
   ///
   pub fn is_literal(&self) -> bool {
-    match *self {
-      Node::Literal { .. } => true,
-      _ => false,
-    }
+    // match *self {
+    //   Node::Literal { .. } => true,
+    //   _ => false,
+    // }
+    matches!(*self, Node::Literal { .. })
   }
 
   /// Returns the `Node` variant.

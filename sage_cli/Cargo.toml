@@ -2,9 +2,9 @@
 name = "sage_cli"
 version = "0.1.1"
 authors = ["Victor I. Afolabi <javafolabi@gmail.com>"]
+description = "Command line interface support for `sage`."
 edition = "2018"
 license = "Apache-2.0"
-description = "Command line interface support for `sage`."
 readme = "README.md"
 repository = "https://github.com/victor-iyi/sage"
 keywords = ["knowledge-graph", "linked-data", "sage", "cli"]

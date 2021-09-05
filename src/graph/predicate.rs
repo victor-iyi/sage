@@ -104,10 +104,7 @@ impl Predicate {
   /// ```
   ///
   pub fn is_literal(&self) -> bool {
-    match *self {
-      Predicate::Literal(_) => true,
-      _ => false,
-    }
+    matches!(*self, Predicate::Literal(_))
   }
 
   /// Check if `Predicate` is of type `Predicate::Uri`.
@@ -127,10 +124,7 @@ impl Predicate {
   /// ```
   ///
   pub fn is_uri(&self) -> bool {
-    match *self {
-      Predicate::Uri(_) => true,
-      _ => false,
-    }
+    matches!(*self, Predicate::Uri(_))
   }
 
   /// Returns the `Predicate` variant.

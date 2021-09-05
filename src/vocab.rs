@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! `sage::vocab` module implements an
-//! [Resource Description Framework (RDF)](https://en.wikipedia.org/wiki/Resource_Description_Framework)
+//! `sage::vocab` module implements an [Resource Description Framework (RDF)]
 //!  namespace (or vocabulary) registry.
+//!
+//! [Resource Description Framework (RDF)]: https://en.wikipedia.org/wiki/Resource_Description_Framework
+//!
 
 mod namespace;
 mod rdf;
