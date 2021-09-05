@@ -1,15 +1,3 @@
-#![allow(dead_code)]
-
-extern crate dotenv;
-// #[macro_use]
-// extern crate log;
-extern crate ntriple;
-extern crate rand;
-extern crate rdf;
-extern crate regex;
-extern crate serde_json;
-extern crate uuid;
-
 mod datastore;
 pub mod error;
 pub mod graph;
@@ -19,8 +7,14 @@ pub mod schema;
 pub mod types;
 pub mod vocab;
 
-/// Sage crate `Result` type.
-pub type SageResult<T> = std::result::Result<T, error::SageError>;
+/// Sage `Result` type.
+pub type Result<T, E = error::Error> = std::result::Result<T, E>;
+
+/// Sage `Result` type.
+pub type SageResult<T, E = error::Error> = Result<T, E>;
+
+/// Sage `Error` type.
+pub type SageError = Error;
 
 /// Re-exports important traits and types. Meant to be glob imported when using Sage.
 pub mod prelude {

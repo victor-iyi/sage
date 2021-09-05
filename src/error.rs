@@ -16,7 +16,6 @@
 use std::error;
 use std::fmt::{self, Debug, Display};
 use std::io;
-use std::result;
 
 /// This type represents all possible errors that can occur when working
 /// with the `sage` Knowledge Graph.
@@ -41,14 +40,7 @@ impl Debug for Error {
     }
 }
 
-/// Alias for a `Error` with the error type `Error`.
-pub type SageError = Error;
 
-/// Alias for a `Result` with the error type `Error`.
-pub type Result<T> = result::Result<T, Error>;
-
-/// Alias for a `Result` with the error type `Error`.
-pub type SageResult<T> = result::Result<T, Error>;
 
 impl Error {
     /// One-based line number at which the error was detected.
@@ -393,7 +385,7 @@ impl Display for ErrorCode {
 }
 
 impl error::Error for Error {
-    // Deprecated! Use Display impl or to_string()
+    // /// Deprecated! Use Display impl or to_string()
     // fn description(&self) -> &str {
     //     match self.err.code {
     //         ErrorCode::Io(ref err) => error::Error::description(err),

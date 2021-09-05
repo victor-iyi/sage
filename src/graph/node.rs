@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::fmt;
 use std::str::FromStr;
 
@@ -196,7 +198,7 @@ impl Iterator for NodeId {
   type Item = NodeId;
 
   /// The generates new `NodeId` each time a new node is created.
-  fn next(&mut self) -> Option<NodeId> {
+  fn next(&mut self) -> Option<Self::Item> {
     let mut counter: u64 = 0;
     counter += 1;
     let ret = format!("{}{}", self.0, counter);
@@ -294,6 +296,7 @@ impl NodeImpl {
     }
   }
 
+  /// Return the id of the current `Node`.
   fn id(&self) -> &str {
     &self.id.0
   }

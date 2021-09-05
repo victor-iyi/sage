@@ -1,5 +1,3 @@
-extern crate clap;
-
 fn main() {
-    println!("Hello, world!");
+    println!("SAGE: Command Line Interface!");
 }

@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 //! `sage::types` contains all/most types used by the `sage` engine. Many types wrap
 //!  native Rust types. Although it's highly advised to use these types rather than
 //! native rust because they include extended functionalities and can also be dereferenced

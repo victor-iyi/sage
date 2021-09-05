@@ -1,33 +1,34 @@
 [package]
 name = "sage"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Victor I. Afolabi <javafolabi@gmail.com>"]
 edition = "2018"
 readme = "README.md"
 description = "Sage is an open source Knowledge Graph used to represent linked-data."
 license = "Apache-2.0"
-repository = "https://github.com/victor-iyiola/sage"
+repository = "https://github.com/victor-iyi/sage"
 keywords = ["knowledge-graph", "linked-data", "sage"]
+publish = false
 
 [lib]
 name = "sage"
-# proc-macro = true
+path = "src/lib.rs"
 
 [dependencies]
-dotenv = "0.14"
+dotenv = "0.15"
 log = "0.4"
 ntriple = "0.1.1"
 regex = "1.3.1"
 rdf = "0.1.4"
-rand = "0.7.0"
+rand = "0.8"
 serde_json = "1.0"
-uuid = { version = "0.7", features = ["serde", "v4"] }
+uuid = { version = "0.8", features = ["serde", "v4"] }
 
 [workspace]
 members = [
-  "sage_cli"
+  "sage_cli",
 ]
 
 [badges]
-appveyor = { repository = "victor-iyiola/sage", service = "github" }
-travis-ci = { repository = "victor-iyiola/sage" }
+appveyor = { repository = "victor-iyi/sage", service = "github" }
+travis-ci = { repository = "victor-iyi/sage" }
