@@ -50,17 +50,12 @@ pub enum Node {
   /// `Http` node is used to represent data coming from an external/http source.
   /// And example of such [James Cameron](https://www.wikidata.org/wiki/Q42574)
   /// node gotten from [wikidata](https://www.wikidata.org/wiki/Wikidata:Main_Page).
-  Http { uri: URI },
+  Http(URI),
 
   /// `Literal` node is used to represent nodes with primitive types
   /// like `Strings`, `Numbers`, `Date`, `Time`, `DateTime` etc.
   /// which contains no extra data associated to this node.
-  Literal { literal: DTypes },
-}
-
-struct Literal<T> {
-  data: T,
-  dtype: Option<DTypes>,
+  Literal(DTypes),
 }
 
 /// Implementation for `Node` enum.
@@ -70,15 +65,14 @@ impl Node {
   /// # Example
   ///
   /// ```rust
-  /// use sage::graph::Node;
-  /// use sage::types::URI;
-  ///
+  /// # use sage::graph::Node;
+  /// # use sage::types::URI;
+  /// #
   /// let node_type = Node::Blank;
   /// assert_eq!(node_type.is_blank(), true);
-  ///
-  /// assert_eq!(Node::Schema.is_blank(), false);
-  /// assert_eq!(Node::Http{ uri: URI::from("https://schema.org/Person")}.is_blank(), false);
-  ///
+  /// #
+  /// # assert_eq!(Node::Schema.is_blank(), false);
+  /// # assert_eq!(Node::Http(URI::from("https://schema.org/Person")).is_blank(), false);
   /// ```
   ///
   pub fn is_blank(&self) -> bool {
@@ -90,14 +84,13 @@ impl Node {
   /// # Example
   ///
   /// ```rust
-  /// use sage::graph::Node;
-  /// use sage::types::URI;
-  ///
+  /// # use sage::graph::Node;
+  /// # use sage::types::URI;
+  /// #
   /// let node_type = Node::Schema;
   /// assert_eq!(node_type.is_schema(), true);
-  ///
-  /// assert_eq!(Node::Http{ uri: URI::from("https://schema.org/Person") }.is_schema(), false);
-  ///
+  /// #
+  /// # assert_eq!(Node::Http(URI::from("https://schema.org/Person")).is_schema(), false);
   /// ```
   ///
   pub fn is_schema(&self) -> bool {
@@ -109,19 +102,18 @@ impl Node {
   /// # Example
   ///
   /// ```rust
-  /// use sage::graph::Node;
-  /// use sage::types::URI;
-  ///
-  /// let node_type = Node::Http{ uri: URI::from("https://schema.org/Person")};
+  /// # use sage::graph::Node;
+  /// # use sage::types::URI;
+  /// #
+  /// let node_type = Node::Http(URI::from("https://schema.org/Person"));
   /// assert_eq!(node_type.is_http(), true);
-  ///
-  /// assert_eq!(Node::Blank.is_http(), false);
-  /// assert_eq!(Node::Schema.is_http(), false);
-  ///
+  /// #
+  /// # assert_eq!(Node::Blank.is_http(), false);
+  /// # assert_eq!(Node::Schema.is_http(), false);
   /// ```
   ///
   pub fn is_http(&self) -> bool {
-    matches!(*self, Node::Http { .. })
+    matches!(*self, Node::Http(_))
   }
 
   /// Check if `Node` is of type `Node::Literal`.
@@ -129,14 +121,14 @@ impl Node {
   /// # Example
   ///
   /// ```rust
-  /// use sage::graph::Node;
-  ///
-  /// let node_type = Node::Literal{ literal: "John Doe".to_string(), language: None, dtype: None};
+  /// # use sage::graph::Node;
+  /// # use sage::types::DTypes;
+  /// #
+  /// let node_type = Node::Literal(DTypes::String("John Doe".to_string()));
   /// assert_eq!(node_type.is_literal(), true);
-  ///
-  /// assert_eq!(Node::Blank.is_literal(), false);
-  /// assert_eq!(Node::Schema.is_literal(), false);
-  ///
+  /// #
+  /// # assert_eq!(Node::Blank.is_literal(), false);
+  /// # assert_eq!(Node::Schema.is_literal(), false);
   /// ```
   ///
   pub fn is_literal(&self) -> bool {
@@ -147,15 +139,13 @@ impl Node {
   ///
   /// # Example
   /// ```rust
-  /// use sage::graph::Node;
-  /// use sage::types::DTypes;
-  ///
-  /// // Assume `Node::Literal` was gotten dynamically.
-  ///
-  /// assert_eq!(Node::Blank.get_type(), &Node::Blank);
-  /// let john : Node = Node::Literal{ literal: "John Doe".to_string(), language: None, dtype: None };
+  /// # use sage::graph::Node;
+  /// # use sage::types::DTypes;
+  /// #
+  /// let john : Node = Node::Literal(DTypes::String("John Doe".to_string()));
   /// assert_eq!(john.get_type(), &john);
   ///
+  /// assert_eq!(Node::Blank.get_type(), &Node::Blank);
   /// ```
   ///
   pub fn get_type(&self) -> &Node {
