@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-fn main() {
-  println!("Sage: An Open source Knowledge Graph.");
+use std::collections::BTreeMap;
+
+/// A key/value type representation.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Map<K, V> {
+  map: MapImpl<K, V>,
 }
+
+type MapImpl<K, V> = BTreeMap<K, V>;

@@ -1,10 +1,26 @@
+// Copyright 2021 Victor I. Afolabi
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#![allow(dead_code)]
+
 use std::fmt;
 use std::str::FromStr;
 
 use regex::Regex;
 
 use crate::error::{Error, ErrorCode};
-use crate::types::{DTypes, URI};
+use crate::types::{DType, URI};
 
 /*
  * +----------------------------------------------------------------------+
@@ -27,130 +43,100 @@ pub enum Node {
   /// `Blank` node containing node with empty or null data.
   Blank,
 
-  /// `Schema` node is created from some type of data structure.
-  /// Usually but not limited to `struct`s.
+  /// `Schema` node is created from some type of structured data.
+  /// For example: wikidata, jsonld, rdf, ntriple or even structs.
   Schema,
 
   /// `Http` node is used to represent data coming from an external/http source.
   /// And example of such [James Cameron](https://www.wikidata.org/wiki/Q42574)
   /// node gotten from [wikidata](https://www.wikidata.org/wiki/Wikidata:Main_Page).
-  Http { uri: URI },
+  Http(URI),
 
   /// `Literal` node is used to represent nodes with primitive types
   /// like `Strings`, `Numbers`, `Date`, `Time`, `DateTime` etc.
   /// which contains no extra data associated to this node.
-  Literal {
-    literal: String,
-    language: Option<String>,
-    dtype: Option<DTypes>,
-  },
+  Literal(DType),
 }
 
 /// Implementation for `Node` enum.
 impl Node {
   /// Check of `Node` is of type `Node::Blank`.
   ///
-  /// # Example
-  ///
   /// ```rust
-  /// use sage::graph::Node;
-  /// use sage::types::URI;
-  ///
+  /// # use sage::graph::Node;
+  /// # use sage::types::URI;
+  /// #
   /// let node_type = Node::Blank;
   /// assert_eq!(node_type.is_blank(), true);
   ///
-  /// assert_eq!(Node::Schema.is_blank(), false);
-  /// assert_eq!(Node::Http{ uri: URI::from("https://schema.org/Person")}.is_blank(), false);
-  ///
+  /// # assert_eq!(Node::Schema.is_blank(), false);
+  /// # assert_eq!(Node::Http(URI::from("https://schema.org/Person")).is_blank(), false);
   /// ```
   ///
   pub fn is_blank(&self) -> bool {
-    match *self {
-      Node::Blank => true,
-      _ => false,
-    }
+    matches!(*self, Node::Blank)
   }
 
   /// Check if `Node` is of type `Node::Schema`.
   ///
-  /// # Example
-  ///
   /// ```rust
-  /// use sage::graph::Node;
-  /// use sage::types::URI;
-  ///
+  /// # use sage::graph::Node;
+  /// # use sage::types::URI;
+  /// #
   /// let node_type = Node::Schema;
   /// assert_eq!(node_type.is_schema(), true);
-  ///
-  /// assert_eq!(Node::Http{ uri: URI::from("https://schema.org/Person") }.is_schema(), false);
-  ///
+  /// #
+  /// # assert_eq!(Node::Http(URI::from("https://schema.org/Person")).is_schema(), false);
   /// ```
   ///
   pub fn is_schema(&self) -> bool {
-    match *self {
-      Node::Schema => true,
-      _ => false,
-    }
+    matches!(*self, Node::Schema)
   }
 
   /// Check if `Node` is of type `Node::Http`.
   ///
-  /// # Example
-  ///
   /// ```rust
-  /// use sage::graph::Node;
-  /// use sage::types::URI;
-  ///
-  /// let node_type = Node::Http{ uri: URI::from("https://schema.org/Person")};
+  /// # use sage::graph::Node;
+  /// # use sage::types::URI;
+  /// #
+  /// let node_type = Node::Http(URI::from("https://schema.org/Person"));
   /// assert_eq!(node_type.is_http(), true);
-  ///
-  /// assert_eq!(Node::Blank.is_http(), false);
-  /// assert_eq!(Node::Schema.is_http(), false);
-  ///
+  /// #
+  /// # assert_eq!(Node::Blank.is_http(), false);
+  /// # assert_eq!(Node::Schema.is_http(), false);
   /// ```
   ///
   pub fn is_http(&self) -> bool {
-    match *self {
-      Node::Http { .. } => true,
-      _ => false,
-    }
+    matches!(*self, Node::Http(_))
   }
 
   /// Check if `Node` is of type `Node::Literal`.
   ///
-  /// # Example
-  ///
   /// ```rust
-  /// use sage::graph::Node;
-  ///
-  /// let node_type = Node::Literal{ literal: "John Doe".to_string(), language: None, dtype: None};
+  /// # use sage::graph::Node;
+  /// # use sage::types::DType;
+  /// #
+  /// let node_type = Node::Literal(DType::String("John Doe".to_string()));
   /// assert_eq!(node_type.is_literal(), true);
-  ///
-  /// assert_eq!(Node::Blank.is_literal(), false);
-  /// assert_eq!(Node::Schema.is_literal(), false);
-  ///
+  /// #
+  /// # assert_eq!(Node::Blank.is_literal(), false);
+  /// # assert_eq!(Node::Schema.is_literal(), false);
   /// ```
   ///
   pub fn is_literal(&self) -> bool {
-    match *self {
-      Node::Literal { .. } => true,
-      _ => false,
-    }
+    matches!(*self, Node::Literal(_))
   }
 
   /// Returns the `Node` variant.
   ///
-  /// # Example
   /// ```rust
-  /// use sage::graph::Node;
-  /// use sage::types::DTypes;
-  ///
-  /// // Assume `Node::Literal` was gotten dynamically.
-  ///
-  /// assert_eq!(Node::Blank.get_type(), &Node::Blank);
-  /// let john : Node = Node::Literal{ literal: "John Doe".to_string(), language: None, dtype: None };
+  /// # use sage::graph::Node;
+  /// # use sage::types::DType;
+  /// #
+  /// let john : Node = Node::Literal(DType::String("John Doe".to_string()));
   /// assert_eq!(john.get_type(), &john);
   ///
+  /// assert_eq!(Node::Blank.get_type(), &Node::Blank);
   /// ```
   ///
   pub fn get_type(&self) -> &Node {
@@ -196,7 +182,7 @@ impl Iterator for NodeId {
   type Item = NodeId;
 
   /// The generates new `NodeId` each time a new node is created.
-  fn next(&mut self) -> Option<NodeId> {
+  fn next(&mut self) -> Option<Self::Item> {
     let mut counter: u64 = 0;
     counter += 1;
     let ret = format!("{}{}", self.0, counter);
@@ -294,6 +280,7 @@ impl NodeImpl {
     }
   }
 
+  /// Return the id of the current `Node`.
   fn id(&self) -> &str {
     &self.id.0
   }

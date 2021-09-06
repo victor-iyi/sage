@@ -1,35 +1,95 @@
-version: 1.0.{build}
-environment:
-  matrix:
-    - APPVEYOR_RUST_CHANNEL: stable
-    - APPVEYOR_RUST_CHANNEL: nightly
-
-install:
-  # Install rust, x86_64-pc-windows-msvc host
-  - curl -sSf -o rustup-init.exe https://win.rustup.rs/
-  - rustup-init.exe -y --default-host x86_64-pc-windows-msvc --default-toolchain %APPVEYOR_RUST_CHANNEL%
-  - set PATH=C:\msys64\usr\bin;%PATH%;C:\Users\appveyor\.cargo\bin
-  - rustc -vV
-  - cargo -vV
+version: 1.3.{build}
 
 branches:
   only:
     - master
     - develop
 
+# Rust needs at least Visual Studio 2013 image to build the MSVC targets.
+image:
+  - Visual Studio 2019
+  # TODO: Add support for UUbuntu and macOS images.
+  # - Ubuntu
+  # - macOS
+
+# This configuration will setup a build for each channel & target combination
+# (8 windows combinations in all). You can add the `beta` channel to make all
+# combinations. There are 2 channels here: stable and nightly.
+#
+# Alternatively, the full version may be specified for the channel to build
+# using that specific version (e.g. channel: 1.5.0).
+#
+# The values for target are the set of windows Rust build targets.
+# Each value is of the form:
+#
+# `ARCH-pc-windows-TOOLCHAIN`
+#
+# Where `ARCH` is the target architecture, either `x86_64` or `i686`, and
+# `TOOLCHAIN` is the linker toolchain to use, either `msvc` or `gnu`.
+#
+# See <https://www.rust-lang.org/downloads.html#win-foot> for a description of
+# the toolchain differences.
+#
+# See <https://github.com/rust-lang-nursery/rustup.rs/#toolchain-specification>
+# for description of toolchains and host triples.
+environment:
+  matrix:
+
+  # MSVC Toolchains
+    # Stable 64-bit MSVC
+    - channel: stable
+      target: x86_64-pc-windows-msvc
+    # Stable 32-bit MSVC
+    - channel: stable
+      target: i686-pc-windows-msvc
+    # Nightly 64-bit MSVC
+    - channel: nightly
+      target: x86_64-pc-windows-msvc
+    # Nightly 32-bit MSVC
+    - channel: nightly
+      target: i686-pc-windows-msvc
+
+  # GNU Toolchains
+    # Stable 64-bit GNU
+    - channel: stable
+      target: x86_64-pc-windows-gnu
+    # Stable 32-bit GNU
+    - channel: stable
+      target: i686-pc-windows-gnu
+    # Nightly 64-bit GNU
+    - channel: nightly
+      target: x86_64-pc-windows-gnu
+    # Nightly 32-bit GNU
+    - channel: nightly
+      target: i686-pc-windows-gnu
+
+# This is the most important part of the Appveyor configuration. This installs
+# the version of Rust specified by the `channel` and `target` environment
+# variables from the "build matrix". This uses rustup to install Rust.
+#
+# For simple configurations, instead of using the build matrix, you can simply
+# set the `default-toolchain` and `default-host` manually here.
+install:
+  - appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
+  - rustup-init -yv --default-toolchain %channel% --default-host %target%
+  - set PATH=%PATH%;%USERPROFILE%\.cargo\bin
+  - rustc -vV
+  - cargo -vV
+
+# See Appveyor documentation for specific details. In short, place any `channel`
+# or `targets` you wish to allow build failures on (usually `nightly` at least
+# is a wise choice). This will prevent a build or test failure in the matching
+# channels/targets from failing the entire build.
+matrix:
+  allow_failures:
+    - channel: nightly
+
+# `cargo test` takes care of building for us, so disable Appveyor's build stage.
+# This prevents the "directory does not contain a project or solution file" error.
 build: false
 
-for:
-  - matrix:
-      only:
-        - APPVEYOR_RUST_CHANNEL: stable
-    test_script:
-      - cargo build
-      - cargo test
-
-  - matrix:
-      only:
-        - APPVEYOR_RUST_CHANNEL: nightly
-    test_script:
-      - cargo build
-      - cargo test
+# Uses `cargo test` to run tests and build. Alternatively, the project may call
+# compiled programs directly or perform other testing commands. Rust will
+# automatically be placed in the `PATH` environment variable.
+test_script:
+  - cargo test --verbose --workspace --all-features

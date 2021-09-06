@@ -1,9 +1,13 @@
 language: rust
-# dist: trusty
 
 rust:
   - stable
   - nightly
+
+jobs:
+  allow_failures:
+    - rust: nightly
+  fast_finish: true
 
 matrix:
   allow_failures:
@@ -12,31 +16,26 @@ matrix:
     - rust: nightly
       script:
         # Build the with nightly version.
-        - rustup run nightly cargo build
-        - rustup run nightly cargo test
-        # Test the command line sage tool.
-        - cd "${TRAVIS_BUILD_DIR}/sage_cli"
-        - rustup run nightly cargo build
-        - rustup run nightly cargo test
+        - cargo build --verbose --workspace --all-features
+        - cargo test --verbose --workspace --all-features
+
+before_cache:
+  - rm -rf "$TRAVIS_HOME/.cargo/registry/src"
+  # Travis can't cache files that are not readable by "others"
+  - chmod -R a+r $HOME/.cargo
 
 cache:
   cargo: true
 
-before_cache:
-  # Travis can't cache files that are not readable by "others"
-  - chmod -R a+r $HOME/.cargo
-
 before_script:
   - rustup component add rustfmt clippy
+  - cargo clippy
+  - cargo fmt
 
 script:
   # Build with the stable version.
-  - cargo build
-  - cargo test
-  # Test the stable command line sage tool.
-  - cd "${TRAVIS_BUILD_DIR}/sage_cli"
-  - cargo build
-  - cargo test
+  - cargo build --verbose --workspace --all-features
+  - cargo test --verbose --workspace --all-features
 
 notifications:
   email: false

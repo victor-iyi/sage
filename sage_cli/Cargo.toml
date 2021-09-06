@@ -1,19 +1,21 @@
 [package]
 name = "sage_cli"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Victor I. Afolabi <javafolabi@gmail.com>"]
 edition = "2018"
-license = "Apache-2.0"
-description = "Provides the CLI for the Sage crate"
+description = "Command line interface support for `sage`."
 readme = "README.md"
-repository = "https://github.com/victor-iyiola/sage"
-keywords = ["knowledge-graph", "linked-data", "sage", "cli"]
+repository = "https://github.com/victor-iyi/sage"
+license = "Apache-2.0"
+keywords = ["sage", "knowledge-graph", "linked-data", "cli"]
+categories = ["command-line-interface", "command-line-utilities"]
+autobins = false
 autotests = false
 
 [[bin]]
-name = "sage"
+name = "sage-cli"
 path = "src/main.rs"
 
 [dependencies]
-clap = "2.33.0"
+clap = "2.33"
 sage = { path = "../../sage" }
