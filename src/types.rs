@@ -19,7 +19,14 @@
 //! native rust because they include extended functionalities and can also be dereferenced
 //!  back and forth into native Rust types  like [Strings](https://doc.rust-lang.org/stable/alloc/string/struct.String.html) and sage types.
 //!
+
 use std::fmt;
+
+mod datetime;
+mod number;
+mod object;
+
+use {self::datetime::DateTime, number::Number, object::Map};
 
 /// `IRI` stands for International Resource Identifer. (ex: <name>).
 pub type IRI = String;
@@ -27,26 +34,63 @@ pub type IRI = String;
 /// `URI` is used to represent any URL-like `IRI`.
 pub type URI = String;
 
-#[derive(Debug, Clone, PartialEq)]
+/// `DTypes` represents the various types which data in the Sage Knowledge
+/// Graph can be represented as.
+#[derive(Clone, Eq, PartialEq)]
 pub enum DTypes {
+  /// Represents a JSON null value.
+  Null,
+
+  /// Represents a boolean (true or false) value.
   Boolean(bool),
-  Text(String),
-  Number,
-  Time,
-  DateTime,
+
+  /// Represents a numeric value,
+  /// either integer or floating point values.
+  Number(Number),
+
+  /// Represents a String or string-like value.
+  String(String),
+
+  /// Represents a collection of values.
+  Array(Vec<DTypes>),
+
+  /// Represents an object type with Key & values.
+  ///
+  /// By default it uses `BTreeMap` which does not preserve
+  /// the entries' order.
+  Object(Map<String, DTypes>),
+
+  /// Represents date, time or datetime.
+  DateTime(DateTime),
 }
 
-#[derive(Debug)]
-enum Number {
-  Float(f64),
-  Integer(isize),
+impl fmt::Debug for DTypes {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    match *self {
+      DTypes::Null => f.debug_tuple("Null").finish(),
+      DTypes::Boolean(b) => f.debug_tuple("Boolean").field(&b).finish(),
+      DTypes::Number(ref n) => fmt::Debug::fmt(&n, f),
+      DTypes::String(ref s) => f.debug_tuple("Sting").field(s).finish(),
+      DTypes::Array(ref a) => {
+        f.write_str("Array(")?;
+        fmt::Debug::fmt(a, f)?;
+        f.write_str(")")
+      }
+      DTypes::Object(ref o) => {
+        f.write_str("Object(")?;
+        fmt::Debug::fmt(o, f)?;
+        f.write_str(")")
+      }
+      DTypes::DateTime(ref d) => fmt::Debug::fmt(&d, f),
+    }
+  }
 }
 
 impl fmt::Display for DTypes {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match &*self {
       DTypes::Boolean(b) => write!(f, "{}", b),
-      DTypes::Text(t) => write!(f, "{}", t),
+      DTypes::String(t) => write!(f, "{}", t),
       // For every other variant, use the Debug trait.
       _ => fmt::Debug::fmt(self, f),
     }
@@ -54,30 +98,6 @@ impl fmt::Display for DTypes {
 }
 
 /*
-enum Number {
-  Float(f64),
-  Integer(isize),
-}
-
-enum Boolean {
-  True,
-  False,
-}
-
-enum Class {
-
-}
-
-enum Date {
-  Date,
-  Time,
-  DateTime,
-}
-
-enum Property {
-
-}
-
 enum SchemaTypes {
   // DateTypes.
   Boolean(bool),

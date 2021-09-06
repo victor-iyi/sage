@@ -70,25 +70,29 @@ pub enum Connection {
   /// Note that the target nodes does not necessarily share a relationship with
   /// the source node.
   ///
-  /// For Example: `John --speaks-> [English, French, Spanish, Dutch].
+  /// For Example: `John --speaks-> [English, French, Spanish, Dutch]`.
   /// Here, "John" has a forward relationship with those languages however the
   /// languages doesn't necessarily share a relationship with "John".
   Multiple,
 }
 
 impl Connection {
+  #[doc(hidden)]
   pub fn is_forward(&self) -> bool {
     matches!(*self, Connection::Forward)
   }
 
+  #[doc(hidden)]
   pub fn is_shared(&self) -> bool {
     matches!(*self, Connection::Shared)
   }
 
+  #[doc(hidden)]
   pub fn is_relational(&self) -> bool {
     matches!(*self, Connection::Relational)
   }
 
+  #[doc(hidden)]
   pub fn is_multiple(&self) -> bool {
     matches!(*self, Connection::Multiple)
   }

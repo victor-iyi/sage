@@ -11,7 +11,7 @@ keywords = ["knowledge-graph", "linked-data", "sage", "cli"]
 autotests = false
 
 [[bin]]
-name = "sage"
+name = "sage-cli"
 path = "src/main.rs"
 
 [dependencies]

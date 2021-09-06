@@ -43,8 +43,8 @@ pub enum Node {
   /// `Blank` node containing node with empty or null data.
   Blank,
 
-  /// `Schema` node is created from some type of data structure.
-  /// Usually but not limited to `struct`s.
+  /// `Schema` node is created from some type of structured data.
+  /// For example: wikidata, jsonld, rdf, ntriple or even structs.
   Schema,
 
   /// `Http` node is used to represent data coming from an external/http source.
@@ -55,11 +55,12 @@ pub enum Node {
   /// `Literal` node is used to represent nodes with primitive types
   /// like `Strings`, `Numbers`, `Date`, `Time`, `DateTime` etc.
   /// which contains no extra data associated to this node.
-  Literal {
-    literal: String,
-    language: Option<String>,
-    dtype: Option<DTypes>,
-  },
+  Literal { literal: DTypes },
+}
+
+struct Literal<T> {
+  data: T,
+  dtype: Option<DTypes>,
 }
 
 /// Implementation for `Node` enum.
@@ -139,10 +140,6 @@ impl Node {
   /// ```
   ///
   pub fn is_literal(&self) -> bool {
-    // match *self {
-    //   Node::Literal { .. } => true,
-    //   _ => false,
-    // }
     matches!(*self, Node::Literal { .. })
   }
 
