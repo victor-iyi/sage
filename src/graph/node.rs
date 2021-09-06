@@ -20,7 +20,7 @@ use std::str::FromStr;
 use regex::Regex;
 
 use crate::error::{Error, ErrorCode};
-use crate::types::{DTypes, URI};
+use crate::types::{DType, URI};
 
 /*
  * +----------------------------------------------------------------------+
@@ -55,14 +55,12 @@ pub enum Node {
   /// `Literal` node is used to represent nodes with primitive types
   /// like `Strings`, `Numbers`, `Date`, `Time`, `DateTime` etc.
   /// which contains no extra data associated to this node.
-  Literal(DTypes),
+  Literal(DType),
 }
 
 /// Implementation for `Node` enum.
 impl Node {
   /// Check of `Node` is of type `Node::Blank`.
-  ///
-  /// # Example
   ///
   /// ```rust
   /// # use sage::graph::Node;
@@ -70,7 +68,7 @@ impl Node {
   /// #
   /// let node_type = Node::Blank;
   /// assert_eq!(node_type.is_blank(), true);
-  /// #
+  ///
   /// # assert_eq!(Node::Schema.is_blank(), false);
   /// # assert_eq!(Node::Http(URI::from("https://schema.org/Person")).is_blank(), false);
   /// ```
@@ -80,8 +78,6 @@ impl Node {
   }
 
   /// Check if `Node` is of type `Node::Schema`.
-  ///
-  /// # Example
   ///
   /// ```rust
   /// # use sage::graph::Node;
@@ -98,8 +94,6 @@ impl Node {
   }
 
   /// Check if `Node` is of type `Node::Http`.
-  ///
-  /// # Example
   ///
   /// ```rust
   /// # use sage::graph::Node;
@@ -118,13 +112,11 @@ impl Node {
 
   /// Check if `Node` is of type `Node::Literal`.
   ///
-  /// # Example
-  ///
   /// ```rust
   /// # use sage::graph::Node;
-  /// # use sage::types::DTypes;
+  /// # use sage::types::DType;
   /// #
-  /// let node_type = Node::Literal(DTypes::String("John Doe".to_string()));
+  /// let node_type = Node::Literal(DType::String("John Doe".to_string()));
   /// assert_eq!(node_type.is_literal(), true);
   /// #
   /// # assert_eq!(Node::Blank.is_literal(), false);
@@ -132,17 +124,16 @@ impl Node {
   /// ```
   ///
   pub fn is_literal(&self) -> bool {
-    matches!(*self, Node::Literal { .. })
+    matches!(*self, Node::Literal(_))
   }
 
   /// Returns the `Node` variant.
   ///
-  /// # Example
   /// ```rust
   /// # use sage::graph::Node;
-  /// # use sage::types::DTypes;
+  /// # use sage::types::DType;
   /// #
-  /// let john : Node = Node::Literal(DTypes::String("John Doe".to_string()));
+  /// let john : Node = Node::Literal(DType::String("John Doe".to_string()));
   /// assert_eq!(john.get_type(), &john);
   ///
   /// assert_eq!(Node::Blank.get_type(), &Node::Blank);

@@ -15,10 +15,11 @@
 #![allow(dead_code)]
 
 //! `sage::types` contains all/most types used by the `sage` engine. Many types wrap
-//!  native Rust types. Although it's highly advised to use these types rather than
+//! native Rust types. Although it's highly advised to use these types rather than
 //! native rust because they include extended functionalities and can also be dereferenced
-//!  back and forth into native Rust types  like [Strings](https://doc.rust-lang.org/stable/alloc/string/struct.String.html) and sage types.
+//! back and forth into native Rust types like [Strings] and sage types.
 //!
+//! [Strings]: https://doc.rust-lang.org/stable/alloc/string/struct.String.html
 
 use std::fmt;
 
@@ -34,66 +35,167 @@ pub type IRI = String;
 /// `URI` is used to represent any URL-like `IRI`.
 pub type URI = String;
 
-/// `DTypes` represents the various types which data in the Sage Knowledge
+/// `DType` represents the various types which data in the Sage Knowledge
 /// Graph can be represented as.
 #[derive(Clone, Eq, PartialEq)]
-pub enum DTypes {
-  /// Represents a JSON null value.
-  Null,
+pub enum DType {
+  /// Represents a collection of values.
+  Array(Vec<DType>),
 
   /// Represents a boolean (true or false) value.
   Boolean(bool),
+
+  /// Represents date, time or datetime.
+  DateTime(DateTime),
+
+  /// Represents a JSON null value.
+  Null,
 
   /// Represents a numeric value,
   /// either integer or floating point values.
   Number(Number),
 
-  /// Represents a String or string-like value.
-  String(String),
-
-  /// Represents a collection of values.
-  Array(Vec<DTypes>),
-
   /// Represents an object type with Key & values.
   ///
   /// By default it uses `BTreeMap` which does not preserve
   /// the entries' order.
-  Object(Map<String, DTypes>),
+  Object(Map<String, DType>),
 
-  /// Represents date, time or datetime.
-  DateTime(DateTime),
+  /// Represents a String or string-like value.
+  String(String),
 }
 
-impl fmt::Debug for DTypes {
+impl fmt::Debug for DType {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match *self {
-      DTypes::Null => f.debug_tuple("Null").finish(),
-      DTypes::Boolean(b) => f.debug_tuple("Boolean").field(&b).finish(),
-      DTypes::Number(ref n) => fmt::Debug::fmt(&n, f),
-      DTypes::String(ref s) => f.debug_tuple("Sting").field(s).finish(),
-      DTypes::Array(ref a) => {
+      DType::Null => f.debug_tuple("Null").finish(),
+      DType::Boolean(b) => f.debug_tuple("Boolean").field(&b).finish(),
+      DType::Number(ref n) => fmt::Debug::fmt(&n, f),
+      DType::String(ref s) => f.debug_tuple("Sting").field(s).finish(),
+      DType::Array(ref a) => {
         f.write_str("Array(")?;
         fmt::Debug::fmt(a, f)?;
         f.write_str(")")
       }
-      DTypes::Object(ref o) => {
+      DType::Object(ref o) => {
         f.write_str("Object(")?;
         fmt::Debug::fmt(o, f)?;
         f.write_str(")")
       }
-      DTypes::DateTime(ref d) => fmt::Debug::fmt(&d, f),
+      DType::DateTime(ref d) => fmt::Debug::fmt(&d, f),
     }
   }
 }
 
-impl fmt::Display for DTypes {
+impl fmt::Display for DType {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match &*self {
-      DTypes::Boolean(b) => write!(f, "{}", b),
-      DTypes::String(t) => write!(f, "{}", t),
+      DType::Boolean(b) => write!(f, "{}", b),
+      DType::String(t) => write!(f, "{}", t),
       // For every other variant, use the Debug trait.
       _ => fmt::Debug::fmt(self, f),
     }
+  }
+}
+
+impl DType {
+  /// Returns true if `DType` is a `Boolean`. Returns false otherwise.
+  ///
+  /// For any `DType` on which `is_bool` returns true, `as_bool` is
+  /// guaranteed to return the boolean value.
+  ///
+  /// ```rust
+  /// # use sage::types::DType;
+  /// #
+  /// let value = DType::Boolean(false);
+  /// assert!(value.is_bool());
+  ///
+  /// // The string "false" is a string, not a boolean.
+  /// let not_bool = DType::String("false".to_string());
+  /// assert!(!not_bool.is_bool());
+  /// ```
+  pub fn is_bool(&self) -> bool {
+    self.as_bool().is_some()
+  }
+
+  /// If the `DType` is a `Boolean`, returns the associated bool.
+  /// Returns `None` otherwise.
+  ///
+  /// ```rust
+  /// # use sage::types::DType;
+  /// #
+  /// let value = DType::Boolean(false);
+  /// assert_eq!(value.as_bool(), Some(false));
+  ///
+  /// // The string "false" is a string, not a boolean.
+  /// let not_bool = DType::String("false".to_string());
+  /// assert_eq!(not_bool.as_bool(), None)
+  /// ```
+  pub fn as_bool(&self) -> Option<bool> {
+    match *self {
+      DType::Boolean(b) => Some(b),
+      _ => None,
+    }
+  }
+
+  /// Returns true if the `DType` is a `Null`. Returns false otherwise.
+  ///
+  /// For any `DType` on which `is_null` returns true, `as_null` is guaranteed
+  /// to return `Some(())`.
+  ///
+  /// ```rust
+  /// # use sage::types::DType;
+  /// #
+  /// let value = DType::Null;
+  /// assert!(value.is_null());
+  ///
+  /// // The boolean `false` is not null.
+  /// let not_null =  DType::Boolean(false);
+  /// assert!(!not_null.is_null());
+  /// ```
+  pub fn is_null(&self) -> bool {
+    self.as_null().is_some()
+  }
+
+  /// If the `DType` is a `Null`, return `()` *(unit type)*. Returns `None` otherwise.
+  ///
+  /// ```
+  /// # use sage::types::DType;
+  /// #
+  /// let value = DType::Null;
+  /// assert_eq!(value.as_null(), Some(()));
+  ///
+  /// // The boolean `false` is not null.
+  /// let not_null = DType::Boolean(false);
+  /// assert_eq!(not_null.as_null(), None);
+  /// ```
+  pub fn as_null(&self) -> Option<()> {
+    match *self {
+      DType::Null => Some(()),
+      _ => None,
+    }
+  }
+
+  /// Takes the value of the `DType`, leaving a `Null` in its place.
+  ///
+  /// # Example
+  ///
+  /// ```rust
+  /// # use sage::types::DType;
+  ///
+  /// let mut value = DType::String("Foo".to_string());
+  /// assert_eq!(value.take(), DType::String("Foo".to_string()));
+  ///
+  /// assert_eq!(value, DType::Null);
+  /// ```
+  pub fn take(&mut self) -> DType {
+    std::mem::replace(self, DType::Null)
+  }
+}
+
+impl Default for DType {
+  fn default() -> DType {
+    DType::Null
   }
 }
 

@@ -12,28 +12,63 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#[derive(Clone, Debug, PartialEq)]
-pub enum Number {
-  /// Floating point number.
+#![allow(clippy::absurd_extreme_comparisons)]
+
+#[cfg(feature = "arbitrary_precision")]
+pub(crate) const TOKEN: &str = "$sage::private::Number";
+
+/// Represents a number, whether integer or floating point.
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct Number {
+  /// Number enum implementation.
+  n: NumImpl,
+}
+
+/// Number implementation without arbitrary precision.
+#[cfg(not(feature = "arbitrary_precision"))]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum NumImpl {
+  /// Floating point number (always finite).
   Float(f64),
-  /// Signed integer - with -ve & +ve values.
+  /// Greater or equal to zero.
   PositiveInt(i64),
-  /// Unsigned integer - with only positive values.
+  /// Always less than zero.
   NegativeInt(u64),
 }
 
-impl Eq for Number {}
+// Implementing Eq is fine since any float values are always finite.
+#[cfg(not(feature = "arbitrary_precision"))]
+impl Eq for NumImpl {}
+
+/// Number representation with arbitrary precision.
+#[cfg(feature = "arbitrary_precision")]
+type NumImpl = String;
 
 impl Number {
+  /// REturns true if the `Number` is an integer between `i64::MIN` & `i64::MAX`.
+  ///
+  /// For any `Number` on which `is_i64` returns true, `as_i64` is guaranteed to
+  /// return the integer value.
+  ///
+  #[inline]
   pub fn is_i64(&self) -> bool {
-    match *self {
-      Number::PositiveInt(n) => n <= i64::MAX,
-      Number::NegativeInt(_) => true,
-      Number::Float(_) => false,
+    match self.n {
+      NumImpl::PositiveInt(n) => n <= i64::MAX,
+      NumImpl::NegativeInt(_) => true,
+      NumImpl::Float(_) => false,
     }
   }
 
+  #[inline]
   pub fn is_u64(&self) -> bool {
-    matches!(*self, Number::PositiveInt(_))
+    matches!(self.n, NumImpl::PositiveInt(_))
+  }
+
+  #[inline]
+  pub fn is_f64(&self) -> bool {
+    match self.n {
+      NumImpl::Float(_) => true,
+      NumImpl::PositiveInt(_) | NumImpl::NegativeInt(_) => false,
+    }
   }
 }

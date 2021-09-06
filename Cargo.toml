@@ -3,12 +3,16 @@ name = "sage"
 version = "0.3.0"
 authors = ["Victor I. Afolabi <javafolabi@gmail.com>"]
 edition = "2018"
-readme = "README.md"
 description = "Sage is an open source Knowledge Graph used to represent linked-data."
-license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.io/victor-iyi/sage"
 repository = "https://github.com/victor-iyi/sage"
-keywords = ["knowledge-graph", "linked-data", "sage"]
+license = "Apache-2.0"
+keywords = ["sage", "knowledge-graph", "linked-data"]
+categories = ["data-structures", "science", "text-processing"]
+exclude = ["/resources"]
 publish = false
+autotests = true
 
 [lib]
 name = "sage"
@@ -16,6 +20,7 @@ path = "src/lib.rs"
 
 [dependencies]
 dotenv = "0.15"
+indexmap = "1.7"
 log = "0.4"
 ntriple = "0.1.1"
 regex = "1.3.1"
