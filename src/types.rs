@@ -23,11 +23,16 @@
 
 use std::fmt;
 
-mod datetime;
-mod number;
-mod object;
+use serde::{de::DeserializeOwned, ser::Serialize};
 
-use {self::datetime::DateTime, number::Number, object::Map};
+use crate::Result;
+
+pub mod datetime;
+pub mod index;
+pub mod map;
+pub mod number;
+
+pub use {self::datetime::DateTime, map::Map, number::Number, ser::Serializer};
 
 /// `IRI` stands for International Resource Identifer. (ex: <name>).
 pub type IRI = String;
@@ -90,8 +95,9 @@ impl fmt::Debug for DType {
 impl fmt::Display for DType {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match &*self {
+      DType::Null => f.write_str("null"),
       DType::Boolean(b) => write!(f, "{}", b),
-      DType::String(t) => write!(f, "{}", t),
+      DType::String(s) => f.write_str(s),
       // For every other variant, use the Debug trait.
       _ => fmt::Debug::fmt(self, f),
     }
@@ -99,13 +105,150 @@ impl fmt::Display for DType {
 }
 
 impl DType {
+  pub fn get<I: index::Index>(&self, index: I) -> Option<&DType> {
+    index.index_into(self)
+  }
+
+  pub fn get_mut<I: index::Index>(&mut self, index: I) -> Option<&mut DType> {
+    index.index_into_mut(self)
+  }
+
+  pub fn is_object(&self) -> bool {
+    self.as_object().is_some()
+  }
+
+  pub fn as_object(&self) -> Option<&Map<String, DType>> {
+    match *self {
+      DType::Object(ref m) => Some(m),
+      _ => None,
+    }
+  }
+
+  pub fn as_object_mut(&mut self) -> Option<&mut Map<String, DType>> {
+    match *self {
+      DType::Object(ref mut m) => Some(m),
+      _ => None,
+    }
+  }
+
+  pub fn is_array(&self) -> bool {
+    self.as_array().is_some()
+  }
+
+  pub fn as_array(&self) -> Option<&Vec<DType>> {
+    match *self {
+      DType::Array(ref a) => Some(&*a),
+      _ => None,
+    }
+  }
+
+  pub fn as_array_mut(&mut self) -> Option<&mut Vec<DType>> {
+    match *self {
+      DType::Array(ref mut v) => Some(v),
+      _ => None,
+    }
+  }
+
+  pub fn is_string(&self) -> bool {
+    self.as_str().is_some()
+  }
+  /// If the `DType` is a String, returns the associated str. Returns None
+  /// otherwise
+  ///
+  /// ```rust
+  /// # use sage::DType;
+  /// #
+  /// let foo = DType::String("foo".to_string());
+  /// assert_eq!(foo.as_str(), Some("foo"));
+  ///
+  /// // The value is: "foo"
+  /// println!("The value of foo: {}", foo);
+  /// ```
+  pub fn as_str(&self) -> Option<&str> {
+    match *self {
+      DType::String(ref s) => Some(s),
+      _ => None,
+    }
+  }
+
+  /// Returns true if the `DType` is a number. Returns false otherwise.
+  ///
+  pub fn is_number(&self) -> bool {
+    matches!(*self, DType::Number(_))
+  }
+
+  /// Returns true if the `DType` is an integer between `i64::MIN` and
+  /// `i64::MAX`.
+  ///
+  /// For any `DType` on which `is_i64` returns true, `as_i64` is guaranteed to
+  /// return the integer value.
+  ///
+  pub fn is_i64(&self) -> bool {
+    matches!(*self, DType::Number(ref n) if n.is_i64())
+  }
+
+  /// Returns true if the `DType` is an integer between zero and `u64::MAX`.
+  ///
+  /// For any `DType` on which `is_u64` returns true, `as_u64` is guaranteed to
+  /// return the integer value.
+  ///
+  pub fn is_u64(&self) -> bool {
+    matches!(*self, DType::Number(ref n) if n.is_u64())
+  }
+
+  /// Returns true if `DType` is a number that can be represented by `f64`.
+  ///
+  /// For any `DType` on which `is_f64` returns true, `as_f64` is guaranteed to
+  /// return the floating point value.
+  ///
+  /// Currently this function returns true if and only if both `is_i64` and
+  /// `is_u64` return false but this is not a guarantee in the future.
+  ///
+  pub fn is_f64(&self) -> bool {
+    // match *self {
+    //   DType::Number(ref n) => n.is_f64(),
+    //   _ => false,
+    // }
+    matches!(*self, DType::Number(ref n) if n.is_f64())
+  }
+
+  /// If the `DType` is an integer, represent it as `i64` if possible. Returns
+  /// `None` otherwise.
+  ///
+  pub fn as_i64(&self) -> Option<i64> {
+    match *self {
+      DType::Number(ref n) => n.as_i64(),
+      _ => None,
+    }
+  }
+
+  /// If the `DType` is an integer, represent it as `u64` if possible. Returns
+  /// `None` otherwise.
+  ///
+  pub fn as_u64(&self) -> Option<u64> {
+    match *self {
+      DType::Number(ref n) => n.as_u64(),
+      _ => None,
+    }
+  }
+
+  /// If the `DType` is a number, represent it as `f64` if possible. Returns
+  /// `None` otherwise.
+  ///
+  pub fn as_f64(&self) -> Option<f64> {
+    match *self {
+      DType::Number(ref n) => n.as_f64(),
+      _ => None,
+    }
+  }
+
   /// Returns true if `DType` is a `Boolean`. Returns false otherwise.
   ///
   /// For any `DType` on which `is_bool` returns true, `as_bool` is
   /// guaranteed to return the boolean value.
   ///
   /// ```rust
-  /// # use sage::types::DType;
+  /// # use sage::DType;
   /// #
   /// let value = DType::Boolean(false);
   /// assert!(value.is_bool());
@@ -122,7 +265,7 @@ impl DType {
   /// Returns `None` otherwise.
   ///
   /// ```rust
-  /// # use sage::types::DType;
+  /// # use sage::DType;
   /// #
   /// let value = DType::Boolean(false);
   /// assert_eq!(value.as_bool(), Some(false));
@@ -144,7 +287,7 @@ impl DType {
   /// to return `Some(())`.
   ///
   /// ```rust
-  /// # use sage::types::DType;
+  /// # use sage::DType;
   /// #
   /// let value = DType::Null;
   /// assert!(value.is_null());
@@ -160,7 +303,7 @@ impl DType {
   /// If the `DType` is a `Null`, return `()` *(unit type)*. Returns `None` otherwise.
   ///
   /// ```
-  /// # use sage::types::DType;
+  /// # use sage::DType;
   /// #
   /// let value = DType::Null;
   /// assert_eq!(value.as_null(), Some(()));
@@ -181,7 +324,7 @@ impl DType {
   /// # Example
   ///
   /// ```rust
-  /// # use sage::types::DType;
+  /// # use sage::DType;
   ///
   /// let mut value = DType::String("Foo".to_string());
   /// assert_eq!(value.take(), DType::String("Foo".to_string()));
@@ -199,20 +342,52 @@ impl Default for DType {
   }
 }
 
-/*
-enum SchemaTypes {
-  // DateTypes.
-  Boolean(bool),
-  Text(IRI),
-  URL(URI),
-  Number,
-  Date,
+// impl Serialize for DType {
+//   fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+//   where
+//     S: serde::Serializer,
+//   {
+//     match *self {
+//       DType::Null => serializer.serialize_unit(),
+//       DType::Boolean(b) => serializer.serialize_bool(b),
+//       DType::Number(ref n) => n.serialize(serializer),
+//       DType::String(ref s) => serializer.serialize_str(s),
+//       DType::Array(ref v) => v.serialize(serializer),
+//       // #[cfg(any(feature = "std", feature = "alloc"))]
+//       DType::Object(ref m) => {
+//         use serde::ser::SerializeMap;
+//         let mut map = tri!(serializer.serialize_map(Some(m.len())));
+//         for (k, v) in m {
+//           tri!(map.serialize_entry(k, v));
+//         }
+//         map.end()
+//       }
+//       // TODO: Handle `DateTime`.
+//       DType::DateTime(_) => todo!(),
+//     }
+//   }
+// }
 
-  Class,
-  Property,
+mod de;
+mod from;
+mod partial_eq;
+mod ser;
+
+pub fn to_dtype<T>(value: T) -> Result<DType>
+where
+  T: Serialize,
+{
+  value.serialize(ser::Serializer)
 }
 
+pub fn from_dtype<T>(value: DType) -> Result<T>
+where
+  T: DeserializeOwned,
+{
+  T::deserialize(value)
+}
 
+/*
 /// The basic data types such as Integers, Strings, etc.
 const DataType: IRI = prefix + "DataType";
 /// Boolean: True or False.

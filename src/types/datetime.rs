@@ -13,7 +13,13 @@
 // limitations under the License.
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub enum DateTime {
+
+pub struct DateTime {
+  d: DateTimeImpl,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum DateTimeImpl {
   Date,
   Time,
   DateTime,

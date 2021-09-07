@@ -21,6 +21,8 @@
 mod datastore;
 pub mod error;
 pub mod graph;
+#[macro_use]
+mod macros;
 mod processor;
 mod query;
 pub mod schema;
@@ -51,6 +53,9 @@ pub mod prelude {
   // Sage schemas. Files and data sage can work with.
   // Example: jsonld, rdf, wikidata, etc.
   pub use crate::schema::*;
+
+  // Export macros.
+  pub use crate::macros::*;
 }
 
 pub use prelude::*;
