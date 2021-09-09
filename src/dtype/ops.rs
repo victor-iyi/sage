@@ -14,6 +14,13 @@
 
 mod de;
 mod from;
-pub mod index;
+mod index;
 mod partial_eq;
 pub mod ser;
+
+pub use ser::{
+  SerializeMap, SerializeStructVariant, SerializeTupleVariant, SerializeVec,
+  Serializer,
+};
+
+pub use index::Index;

@@ -58,7 +58,7 @@ pub const TOKEN: &str = "$sage::raw::RawDType";
 /// # Example
 ///
 /// ```rust,ignore
-/// use serde::{Deserialize, Serialize};
+/// use serde_derive::{Deserialize, Serialize};
 /// use sage::{Result, json::RawDType};
 ///
 /// #[derive(Deserialize)]
@@ -87,7 +87,7 @@ pub const TOKEN: &str = "$sage::raw::RawDType";
 ///         info: (input.code, input.payload),
 ///     };
 ///
-///     sage::to_string(&output)
+///     sage::json::to_string(&output)
 /// }
 ///
 /// fn main() -> Result<()> {
@@ -103,8 +103,8 @@ pub const TOKEN: &str = "$sage::raw::RawDType";
 ///
 /// The typical usage of `RawDType` will be in the borrowed form:
 ///
-/// ```rust,ignore
-/// # use serde::Deserialize;
+/// ```rust
+/// # use serde_derive::Deserialize;
 /// # use sage::json::RawDType;
 /// #
 /// #[derive(Deserialize)]
@@ -118,7 +118,7 @@ pub const TOKEN: &str = "$sage::raw::RawDType";
 /// [`sage::json::from_str`] and [`sage::json::from_slice`] which support
 /// borrowing from the input data without memory allocation.
 ///
-/// When deserializing through [`sage::from_reader`] you will need to use
+/// When deserializing through [`sage::json::from_reader`] you will need to use
 /// the boxed form of `RawDType` instead. This is almost as efficient but
 /// involves buffering the raw value from the I/O stream into memory.
 ///
@@ -126,8 +126,8 @@ pub const TOKEN: &str = "$sage::raw::RawDType";
 /// [`sage::json::from_slice`]: ../fn.from_slice.html
 /// [`sage::json::from_reader`]: ../fn.from_reader.html
 ///
-/// ```rust,ignore
-/// # use serde::Deserialize;
+/// ```rust
+/// # use serde_derive::Deserialize;
 /// # use sage::json::RawDType;
 /// #
 /// #[derive(Deserialize)]
@@ -210,7 +210,7 @@ impl RawDType {
   /// # Example
   ///
   /// ```rust,ignore
-  /// use serde::Deserialize;
+  /// use serde_derive::Deserialize;
   /// use sage::{Result, json::RawDType};
   ///
   /// #[derive(Deserialize)]
@@ -221,16 +221,16 @@ impl RawDType {
   /// }
   ///
   /// fn process(input: &str) -> Result<()> {
-  ///     let response: Response = sage::json::from_str(input)?;
+  ///   let response: Response = sage::json::from_str(input)?;
   ///
-  ///     let payload = response.payload.get();
-  ///     if payload.starts_with('{') {
-  ///         // handle a payload which is a JSON map
-  ///     } else {
-  ///         // handle any other type
-  ///     }
+  ///   let payload = response.payload.get();
+  ///   if payload.starts_with('{') {
+  ///     // handle a payload which is a JSON map
+  ///   } else {
+  ///     // handle any other type
+  ///   }
   ///
-  ///     Ok(())
+  ///   Ok(())
   /// }
   ///
   /// fn main() -> Result<()> {
@@ -256,16 +256,17 @@ impl RawDType {
 /// # Example
 ///
 /// ```rust,ignore
+/// # use serde_derive::Serialize;
+/// #
 /// // Upstream crate
 /// # #[derive(Serialize)]
 /// pub struct Thing {
-///     foo: String,
-///     bar: Option<String>,
-///     extra_data: Box<RawDType>,
+///   foo: String,
+///   bar: Option<String>,
+///   extra_data: Box<RawDType>,
 /// }
 ///
 /// // Local crate
-/// use serde::Serialize;
 /// use sage::json::{to_raw_dtype, RawDType};
 ///
 /// #[derive(Serialize)]

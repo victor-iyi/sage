@@ -20,6 +20,14 @@ use serde::ser::{Impossible, Serialize};
 #[cfg(feature = "arbitrary_precision")]
 use serde::serde_if_integer128;
 
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `serde::ser::Serialize` for `DType`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
+
 impl Serialize for DType {
   #[inline]
   fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -46,6 +54,14 @@ impl Serialize for DType {
   }
 }
 
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `Serializer` - whose output is `DType`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
+
 /// Serializer whose output is a `DType`.
 ///
 /// This is the serializer that backs [`sage::to_dtype`][crate::to_dtype].
@@ -55,7 +71,7 @@ impl Serialize for DType {
 ///
 /// The `to_dtype` function is implementable as:
 ///
-/// ```rust,ignore
+/// ```rust
 /// use serde::Serialize;
 /// use sage::{Error, DType};
 ///
@@ -63,7 +79,7 @@ impl Serialize for DType {
 /// where
 ///     T: Serialize,
 /// {
-///     input.serialize(sage::json::Serializer)
+///     input.serialize(sage::dtype::Serializer)
 /// }
 /// ```
 pub struct Serializer;
@@ -298,6 +314,15 @@ impl serde::Serializer for Serializer {
   }
 }
 
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `SerializeVec`, `SerializeTupleVariant`, `SerializeMap`.
+ * | | `SerializeStructVariant`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
+
 pub struct SerializeVec {
   vec: Vec<DType>,
 }
@@ -322,6 +347,14 @@ pub struct SerializeStructVariant {
   name: String,
   map: Map<String, DType>,
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `SerializeVec`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 impl serde::ser::SerializeSeq for SerializeVec {
   type Ok = DType;
@@ -372,6 +405,14 @@ impl serde::ser::SerializeTupleStruct for SerializeVec {
   }
 }
 
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `SerializeTupleVariant`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
+
 impl serde::ser::SerializeTupleVariant for SerializeTupleVariant {
   type Ok = DType;
   type Error = Error;
@@ -392,6 +433,14 @@ impl serde::ser::SerializeTupleVariant for SerializeTupleVariant {
     Ok(DType::Object(object))
   }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `SerializeMap`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 impl serde::ser::SerializeMap for SerializeMap {
   type Ok = DType;
@@ -448,6 +497,14 @@ impl serde::ser::SerializeMap for SerializeMap {
     }
   }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `MapKeySerializer`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 struct MapKeySerializer;
 
@@ -687,6 +744,14 @@ impl serde::ser::SerializeStruct for SerializeMap {
   }
 }
 
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `SerializeStructVariant`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
+
 impl serde::ser::SerializeStructVariant for SerializeStructVariant {
   type Ok = DType;
   type Error = Error;
@@ -707,6 +772,14 @@ impl serde::ser::SerializeStructVariant for SerializeStructVariant {
     Ok(DType::Object(object))
   }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `NumberDTypeEmitter`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 #[cfg(feature = "arbitrary_precision")]
 struct NumberDTypeEmitter;
@@ -886,6 +959,14 @@ impl serde::ser::Serializer for NumberDTypeEmitter {
     Err(invalid_number())
   }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `RawDTypeEmitter`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 #[cfg(feature = "raw_value")]
 struct RawDTypeEmitter;

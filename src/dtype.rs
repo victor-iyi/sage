@@ -31,7 +31,7 @@ pub mod number;
 mod ops;
 
 // Re-export public members.
-pub use {datetime::DateTime, map::Map, number::Number};
+pub use {datetime::DateTime, map::Map, number::Number, ops::*};
 
 /// `IRI` stands for International Resource Identifer. (ex: <name>).
 pub type IRI = String;
@@ -93,7 +93,7 @@ impl fmt::Debug for DType {
       DType::Null => f.debug_tuple("Null").finish(),
       DType::Boolean(b) => f.debug_tuple("Boolean").field(&b).finish(),
       DType::Number(ref n) => fmt::Debug::fmt(&n, f),
-      DType::String(ref s) => f.debug_tuple("Sting").field(s).finish(),
+      DType::String(ref s) => f.debug_tuple("String").field(s).finish(),
       DType::Array(ref a) => {
         f.write_str("Array(")?;
         fmt::Debug::fmt(a, f)?;
@@ -158,7 +158,7 @@ impl DType {
   /// assert_eq!(object[0]["x"]["y"]["z"], json!(null));
   /// ```
   ///
-  pub fn get<I: ops::index::Index>(&self, index: I) -> Option<&DType> {
+  pub fn get<I: Index>(&self, index: I) -> Option<&DType> {
     index.index_into(self)
   }
 
@@ -180,10 +180,7 @@ impl DType {
   /// let mut array = json!(["A", "B", "C"]);
   /// *array.get_mut(2).unwrap() = json!("D");
   /// ```
-  pub fn get_mut<I: ops::index::Index>(
-    &mut self,
-    index: I,
-  ) -> Option<&mut DType> {
+  pub fn get_mut<I: Index>(&mut self, index: I) -> Option<&mut DType> {
     index.index_into_mut(self)
   }
 
@@ -639,7 +636,7 @@ impl DType {
   ///
   /// # Example
   ///
-  /// ```rust,ignore
+  /// ```rust
   /// use sage::DType;
   ///
   /// fn main() {
@@ -713,10 +710,9 @@ impl DType {
 ///
 /// # Examples
 ///
-/// ```rust,ignore
-/// # use serde::Deserialize;
-/// # use sage::Result;
-/// use sage::json;
+/// ```rust
+/// # use serde_derive::Deserialize;
+/// use sage::{DType, Result};
 ///
 /// #[derive(Deserialize)]
 /// struct Settings {
@@ -727,7 +723,7 @@ impl DType {
 ///
 /// # fn try_main() -> Result<()> {
 /// let data = r#" { "level": 42 } "#;
-/// let s: Settings = sage::from_str(data)?;
+/// let s: Settings = sage::json::from_str(data)?;
 ///
 /// assert_eq!(s.level, 42);
 /// assert_eq!(s.extras, DType::Null);

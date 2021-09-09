@@ -247,7 +247,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
   ///
   /// # Examples
   ///
-  /// ```rust,ignore
+  /// ```rust
   /// use serde::Deserialize;
   /// use sage::DType;
   ///
@@ -1683,7 +1683,7 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
   ///
   /// You can use this to parse JSON strings containing invalid UTF-8 bytes.
   ///
-  /// ```rust,ignore
+  /// ```rust
   /// use serde_bytes::ByteBuf;
   ///
   /// fn look_at_bytes() -> Result<(), sage::Error> {
@@ -1704,17 +1704,17 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
   /// to be valid, and `\u` escape sequences are required to represent valid
   /// Unicode code points.
   ///
-  /// ```rust,ignore
+  /// ```rust
   /// use serde_bytes::ByteBuf;
   ///
   /// fn look_at_bytes() {
-  ///     let json_data = b"\"invalid unicode surrogate: \\uD801\"";
-  ///     let parsed: Result<ByteBuf, _> = sage::json::from_slice(json_data);
+  ///   let json_data = b"\"invalid unicode surrogate: \\uD801\"";
+  ///   let parsed: Result<ByteBuf, _> = sage::json::from_slice(json_data);
   ///
-  ///     assert!(parsed.is_err());
+  ///   assert!(parsed.is_err());
   ///
-  ///     let expected_msg = "unexpected end of hex escape at line 1 column 35";
-  ///     assert_eq!(expected_msg, parsed.unwrap_err().to_string());
+  ///   let expected_msg = "unexpected end of hex escape at line 1 column 35";
+  ///   assert_eq!(expected_msg, parsed.unwrap_err().to_string());
   /// }
   /// #
   /// # look_at_bytes();
@@ -2573,8 +2573,8 @@ where
 ///
 /// Reading the contents of a file.
 ///
-/// ```rust,ignore
-/// use serde::Deserialize;
+/// ```rust
+/// use serde_derive::Deserialize;
 ///
 /// use std::error::Error;
 /// use std::fs::File;
@@ -2610,7 +2610,7 @@ where
 /// Reading from a persistent socket connection.
 ///
 /// ```rust,ignore
-/// use serde::Deserialize;
+/// use serde_derive::Deserialize;
 ///
 /// use std::error::Error;
 /// use std::net::{TcpListener, TcpStream};
@@ -2622,10 +2622,10 @@ where
 /// }
 ///
 /// fn read_user_from_stream(tcp_stream: TcpStream) -> Result<User, Box<dyn Error>> {
-///     let mut de = sage::json::Deserializer::from_reader(tcp_stream);
-///     let u = User::deserialize(&mut de)?;
+///   let mut de = sage::json::Deserializer::from_reader(tcp_stream);
+///   let u = User::deserialize(&mut de)?;
 ///
-///     Ok(u)
+///   Ok(u)
 /// }
 ///
 /// fn main() {
@@ -2660,8 +2660,8 @@ where
 ///
 /// # Example
 ///
-/// ```rust,ignore
-/// use serde::Deserialize;
+/// ```rust
+/// use serde_derive::Deserialize;
 ///
 /// #[derive(Deserialize, Debug)]
 /// struct User {
@@ -2702,8 +2702,8 @@ where
 ///
 /// # Example
 ///
-/// ```rust,ignore
-/// use serde::Deserialize;
+/// ```rust
+/// use serde_derive::Deserialize;
 ///
 /// #[derive(Deserialize, Debug)]
 /// struct User {

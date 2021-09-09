@@ -21,7 +21,6 @@ path = "src/lib.rs"
 [dependencies]
 dotenv = "0.15"
 ryu = "1.0.5"
-log = "0.4"
 ntriple = "0.1.1"
 regex = "1.5"
 rdf = "0.1.4"
@@ -32,6 +31,13 @@ serde = { version = "1.0", default-features = false }
 serde_json = { version = "1.0" }
 uuid = { version = "0.8", features = ["serde", "v4"] }
 indexmap = { version = "1.7", optional = true }
+
+[dev-dependencies]
+log = "0.4"
+serde = "*"
+serde_bytes = "*"
+serde_stacker = "*"
+serde_derive = "*"
 
 [workspace]
 members = [
