@@ -18,8 +18,7 @@
 /// # Example
 ///
 /// ```rust
-/// use sage::types::IRI;
-/// use sage::vocab::Vocabulary;
+/// use sage::{ dtype::IRI, vocab::Vocabulary };
 ///
 /// // My custom example vocabulary namespace.
 /// struct ExampleVoc;
@@ -54,8 +53,7 @@ pub trait Vocabulary {
   /// # Example
   ///
   /// ```rust
-  /// use sage::types::IRI;
-  /// use sage::vocab::Vocabulary;
+  /// use sage::{ dtype::IRI, vocab::Vocabulary };
   ///
   /// // My custom example vocabulary namespace.
   /// struct ExampleVoc;
@@ -83,9 +81,7 @@ pub trait Vocabulary {
   /// # Example
   ///
   /// ```rust
-  ///
-  /// use sage::types::IRI;
-  /// use sage::vocab::Vocabulary;
+  /// use sage::{ dtype::IRI, vocab::Vocabulary };
   ///
   /// // My custom example vocabulary namespace.
   /// struct ExampleVoc;

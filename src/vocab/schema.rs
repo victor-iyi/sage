@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::types::IRI;
-use crate::vocab::Vocabulary;
+use crate::{dtype::IRI, vocab::Vocabulary};
 
 /// `SchemaVocab` contains constants of the <https://schema.org> vocabulary.
 ///
@@ -23,7 +22,7 @@ use crate::vocab::Vocabulary;
 /// ## Basic Usage
 ///
 /// ```rust
-/// use sage::types::IRI;
+/// use sage::dtype::IRI;
 /// use sage::vocab::{Vocabulary, SchemaVocab};
 ///
 /// assert_eq!(SchemaVocab::prefix(), IRI::from("schema:"));

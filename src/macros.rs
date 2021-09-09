@@ -12,12 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::collections::BTreeMap;
+mod json;
 
-/// A key/value type representation.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Map<K, V> {
-  map: MapImpl<K, V>,
+#[macro_export]
+#[doc(hidden)]
+macro_rules! tri {
+  ($e:expr) => {
+    match $e {
+      crate::Result::Ok(val) => val,
+      crate::Result::Err(err) => return crate::Result::Err(err),
+    }
+  };
+  ($e:expr) => {
+    tri!($e)
+  };
 }
-
-type MapImpl<K, V> = BTreeMap<K, V>;
