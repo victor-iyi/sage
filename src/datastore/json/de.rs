@@ -14,6 +14,9 @@
 
 //! Deserialize JSON data to a Rust data structure.
 
+#[cfg(feature = "float_roundtrip")]
+use std::iter;
+
 use std::{io, iter::FusedIterator, marker::PhantomData, str::FromStr};
 
 use crate::{Error, ErrorCode, Result};
@@ -643,7 +646,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
   //   }
   // }
 
-  #[cfg(not(feature = "float_roundtrip"))]
+  // #[cfg(not(feature = "float_roundtrip"))]
   fn f64_from_parts(
     &mut self,
     positive: bool,
@@ -902,28 +905,28 @@ impl<'de, R: Read<'de>> Deserializer<R> {
     Ok(if positive { 0.0 } else { -0.0 })
   }
 
-  // #[cfg(feature = "float_roundtrip")]
-  // fn f64_long_from_parts(
-  //   &mut self,
-  //   positive: bool,
-  //   integer_end: usize,
-  //   exponent: i32,
-  // ) -> Result<f64> {
-  //   let integer = &self.scratch[..integer_end];
-  //   let fraction = &self.scratch[integer_end..];
+  #[cfg(feature = "float_roundtrip")]
+  fn f64_long_from_parts(
+    &mut self,
+    positive: bool,
+    integer_end: usize,
+    exponent: i32,
+  ) -> Result<f64> {
+    let integer = &self.scratch[..integer_end];
+    let fraction = &self.scratch[integer_end..];
 
-  //   let f = if self.single_precision {
-  //     lexical::parse_truncated_float::<f32>(integer, fraction, exponent) as f64
-  //   } else {
-  //     lexical::parse_truncated_float::<f64>(integer, fraction, exponent)
-  //   };
+    let f = if self.single_precision {
+      lexical::parse_truncated_float::<f32>(integer, fraction, exponent) as f64
+    } else {
+      lexical::parse_truncated_float::<f64>(integer, fraction, exponent)
+    };
 
-  //   if f.is_infinite() {
-  //     Err(self.error(ErrorCode::NumberOutOfRange))
-  //   } else {
-  //     Ok(if positive { f } else { -f })
-  //   }
-  // }
+    if f.is_infinite() {
+      Err(self.error(ErrorCode::NumberOutOfRange))
+    } else {
+      Ok(if positive { f } else { -f })
+    }
+  }
 
   fn parse_any_signed_number(&mut self) -> Result<ParserNumber> {
     let peek = match tri!(self.peek()) {
@@ -1325,7 +1328,7 @@ impl FromStr for Number {
   }
 }
 
-#[cfg(not(feature = "float_roundtrip"))]
+// #[cfg(not(feature = "float_roundtrip"))]
 static POW10: [f64; 309] = [
   1e000, 1e001, 1e002, 1e003, 1e004, 1e005, 1e006, 1e007, 1e008, 1e009, //
   1e010, 1e011, 1e012, 1e013, 1e014, 1e015, 1e016, 1e017, 1e018, 1e019, //
