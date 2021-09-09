@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::types::IRI;
+use crate::dtype::IRI;
 
 use std::collections::HashMap;
 
@@ -74,8 +74,7 @@ impl Namespace {
   /// # Example
   ///
   /// ```rust
-  /// use sage::types::IRI;
-  /// use sage::vocab::Namespace;
+  /// use sage::{ dtype::IRI, vocab::Namespace };
   ///
   /// let prefix: IRI = IRI::from("rdf:type");
   /// let full: IRI = IRI::from("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
@@ -98,8 +97,7 @@ impl Namespace {
   /// # Example
   ///
   /// ```rust
-  /// use sage::types::IRI;
-  /// use sage::vocab::Namespace;
+  /// use sage::{ dtype::IRI, vocab::Namespace };
   ///
   /// // Creates a new namespace using a sing literal.
   /// let ns = Namespace::from("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
@@ -120,8 +118,7 @@ impl Namespace {
   /// # Example
   ///
   /// ```rust
-  /// use sage::types::IRI;
-  /// use sage::vocab::Namespace;
+  /// use sage::{ dtype::IRI, vocab::Namespace };
   ///
   /// // Creates a new namespace using a sing literal.
   /// let ns = Namespace::from("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
@@ -137,8 +134,7 @@ impl Namespace {
   /// # Example
   ///
   /// ```rust
-  /// use sage::types::IRI;
-  /// use sage::vocab::Namespace;
+  /// use sage::{ dtype::IRI, vocab::Namespace };
   ///
   /// // Creates a new namespace using a sing literal.
   /// let ns = Namespace::from("rdf:type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
@@ -156,8 +152,7 @@ impl Default for Namespace {
   /// # Example
   ///
   /// ```rust
-  /// use sage::types::IRI;
-  /// use sage::vocab::Namespace;
+  /// use sage::{ dtype::IRI, vocab::Namespace };
   ///
   /// let ns : Namespace = Namespace::default();
   ///
@@ -201,8 +196,10 @@ impl NamespaceStore {
   /// # Example
   ///
   /// ```rust
-  /// use sage::types::IRI;
-  /// use sage::vocab::{Namespace, NamespaceStore};
+  /// use sage::{
+  ///   dtype::IRI,
+  ///   vocab::{Namespace, NamespaceStore},
+  /// };
   ///
   /// // Create a Namespace store.
   /// let mut ns = NamespaceStore::new();
@@ -218,8 +215,10 @@ impl NamespaceStore {
   /// You could also use `NamespaceStore` alias -> `Namespaces`, in case you say it's too long.
   ///
   /// ```rust
-  /// use sage::types::IRI;
-  /// use sage::vocab::{Namespace, Namespaces};
+  /// use sage::{
+  ///   dtype::IRI,
+  ///   vocab::{Namespace, Namespaces}
+  /// };
   ///
   /// // Create a Namespace store.
   /// let mut ns = Namespaces::new();
@@ -243,8 +242,7 @@ impl NamespaceStore {
   /// # Example
   ///
   /// ```rust
-  /// use sage::types::IRI;
-  /// use sage::vocab::NamespaceStore;
+  /// use sage::{ dtype::IRI, vocab::NamespaceStore };
   ///
   /// // Create a mutable namespace store.
   /// let mut ns = NamespaceStore::new();
@@ -309,7 +307,7 @@ impl NamespaceStore {
   /// # Example
   ///
   /// ```
-  /// use sage::types::IRI;
+  /// use sage::dtype::IRI;
   /// use sage::vocab::NamespaceStore;
   ///
   /// // Create a mutable namespace store.
@@ -347,7 +345,7 @@ impl NamespaceStore {
   /// # Example
   ///
   /// ```rust
-  /// use sage::types::IRI;
+  /// use sage::dtype::IRI;
   /// use sage::vocab::NamespaceStore;
   ///
   ///   // Create a mutable namespace store.

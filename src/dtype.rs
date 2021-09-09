@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![allow(dead_code)]
-
-//! `sage::types` contains all/most types used by the `sage` engine. Many types wrap
+//! `sage::dtype` contains all/most types used by the `sage` engine. Many types wrap
 //! native Rust types. Although it's highly advised to use these types rather than
 //! native rust because they include extended functionalities and can also be dereferenced
 //! back and forth into native Rust types like [Strings] and sage types.
@@ -28,17 +26,26 @@ use serde::{de::DeserializeOwned, ser::Serialize};
 use crate::Result;
 
 pub mod datetime;
-pub mod index;
 pub mod map;
 pub mod number;
+mod ops;
 
-pub use {self::datetime::DateTime, map::Map, number::Number, ser::Serializer};
+// Re-export public members.
+pub use {datetime::DateTime, map::Map, number::Number};
 
 /// `IRI` stands for International Resource Identifer. (ex: <name>).
 pub type IRI = String;
 
 /// `URI` is used to represent any URL-like `IRI`.
 pub type URI = String;
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `DType`
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 /// `DType` represents the various types which data in the Sage Knowledge
 /// Graph can be represented as.
@@ -69,6 +76,16 @@ pub enum DType {
   /// Represents a String or string-like value.
   String(String),
 }
+
+/// [`DType`] represents the various types which data in the Sage Knowledge
+/// Graph can be represented as.
+///
+///
+/// Common source of error is forgetting capitalizing "T" in `DType`.
+/// This is an alias to represent [`DType`] as `Dtype`.
+///
+/// [`DType`]: struct.DType.html
+pub type Dtype = DType;
 
 impl fmt::Debug for DType {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -141,7 +158,7 @@ impl DType {
   /// assert_eq!(object[0]["x"]["y"]["z"], json!(null));
   /// ```
   ///
-  pub fn get<I: index::Index>(&self, index: I) -> Option<&DType> {
+  pub fn get<I: ops::index::Index>(&self, index: I) -> Option<&DType> {
     index.index_into(self)
   }
 
@@ -163,7 +180,10 @@ impl DType {
   /// let mut array = json!(["A", "B", "C"]);
   /// *array.get_mut(2).unwrap() = json!("D");
   /// ```
-  pub fn get_mut<I: index::Index>(&mut self, index: I) -> Option<&mut DType> {
+  pub fn get_mut<I: ops::index::Index>(
+    &mut self,
+    index: I,
+  ) -> Option<&mut DType> {
     index.index_into_mut(self)
   }
 
@@ -556,6 +576,112 @@ impl DType {
     }
   }
 
+  /// Looks up a value by a JSON Pointer.
+  ///
+  /// JSON Pointer defines a string syntax for identifying a specific value
+  /// within a JavaScript Object Notation (JSON) document.
+  ///
+  /// A Pointer is a Unicode string with the reference tokens separated by `/`.
+  /// Inside tokens `/` is replaced by `~1` and `~` is replaced by `~0`. The
+  /// addressed value is returned and if there is no such value `None` is
+  /// returned.
+  ///
+  /// For more information read [RFC6901].
+  ///
+  /// # Example
+  ///
+  /// ```rust
+  /// # use sage::json;
+  /// #
+  /// let data = json!({
+  ///     "x": {
+  ///         "y": ["z", "zz"]
+  ///     }
+  /// });
+  ///
+  /// assert_eq!(data.pointer("/x/y/1").unwrap(), &json!("zz"));
+  /// assert_eq!(data.pointer("/a/b/c"), None);
+  /// ```
+  ///
+  /// [RFC6901]: https://tools.ietf.org/html/rfc6901
+  pub fn pointer(&self, pointer: &str) -> Option<&DType> {
+    if pointer.is_empty() {
+      return Some(self);
+    }
+    if !pointer.starts_with('/') {
+      return None;
+    }
+    pointer
+      .split('/')
+      .skip(1)
+      .map(|x| x.replace("~1", "/").replace("~0", "~"))
+      .try_fold(self, |target, token| match target {
+        DType::Object(map) => map.get(&token),
+        DType::Array(list) => {
+          Self::parse_index(&token).and_then(|x| list.get(x))
+        }
+        _ => None,
+      })
+  }
+
+  /// Looks up a value by a JSON Pointer and returns a mutable reference to
+  /// that value.
+  ///
+  /// JSON Pointer defines a string syntax for identifying a specific value
+  /// within a JavaScript Object Notation (JSON) document.
+  ///
+  /// A Pointer is a Unicode string with the reference tokens separated by `/`.
+  /// Inside tokens `/` is replaced by `~1` and `~` is replaced by `~0`. The
+  /// addressed value is returned and if there is no such value `None` is
+  /// returned.
+  ///
+  /// For more information read [RFC6901](https://tools.ietf.org/html/rfc6901).
+  ///
+  /// # Example
+  ///
+  /// ```rust,ignore
+  /// use sage::DType;
+  ///
+  /// fn main() {
+  ///
+  ///     let s = r#"{"x": 1.0, "y": 2.0}"#;
+  ///     let mut obj: DType = sage::json::from_str(s).unwrap();
+  ///
+  ///     // Check value using read-only pointer
+  ///     assert_eq!(obj.pointer("/x"), Some(&1.0.into()));
+  ///     // Change value with direct assignment
+  ///     *obj.pointer_mut("/x").unwrap() = 1.5.into();
+  ///     // Check that new value was written
+  ///     assert_eq!(obj.pointer("/x"), Some(&1.5.into()));
+  ///     // Or change the value only if it exists
+  ///     obj.pointer_mut("/x").map(|o| *o = 1.5.into());
+  ///
+  ///     // "Steal" ownership of a value. Can replace with any valid DType.
+  ///     let old_x = obj.pointer_mut("/x").map(DType::take).unwrap();
+  ///     assert_eq!(old_x, 1.5);
+  ///     assert_eq!(obj.pointer("/x").unwrap(), &DType::Null);
+  /// }
+  /// ```
+  pub fn pointer_mut(&mut self, pointer: &str) -> Option<&mut DType> {
+    if pointer.is_empty() {
+      return Some(self);
+    }
+    if !pointer.starts_with('/') {
+      return None;
+    }
+    pointer
+      .split('/')
+      .skip(1)
+      .map(|x| x.replace("~1", "/").replace("~0", "~"))
+      .try_fold(self, |target, token| match target {
+        DType::Object(map) => map.get_mut(&token),
+        DType::Array(list) => {
+          Self::parse_index(&token).and_then(move |x| list.get_mut(x))
+        }
+        _ => None,
+      })
+  }
+
   /// Takes the value of the `DType`, leaving a `Null` in its place.
   ///
   /// # Example
@@ -570,6 +696,14 @@ impl DType {
   /// ```
   pub fn take(&mut self) -> DType {
     std::mem::replace(self, DType::Null)
+  }
+
+  #[cold]
+  fn parse_index(s: &str) -> Option<usize> {
+    if s.starts_with('+') || (s.starts_with('0') && s.len() != 1) {
+      return None;
+    }
+    s.parse().ok()
   }
 }
 
@@ -609,42 +743,19 @@ impl Default for DType {
   }
 }
 
-// impl Serialize for DType {
-//   fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-//   where
-//     S: serde::Serializer,
-//   {
-//     match *self {
-//       DType::Null => serializer.serialize_unit(),
-//       DType::Boolean(b) => serializer.serialize_bool(b),
-//       DType::Number(ref n) => n.serialize(serializer),
-//       DType::String(ref s) => serializer.serialize_str(s),
-//       DType::Array(ref v) => v.serialize(serializer),
-//       // #[cfg(any(feature = "std", feature = "alloc"))]
-//       DType::Object(ref m) => {
-//         use serde::ser::SerializeMap;
-//         let mut map = tri!(serializer.serialize_map(Some(m.len())));
-//         for (k, v) in m {
-//           tri!(map.serialize_entry(k, v));
-//         }
-//         map.end()
-//       }
-//       // TODO: Handle `DateTime`.
-//       DType::DateTime(_) => todo!(),
-//     }
-//   }
-// }
-
-mod de;
-mod from;
-mod partial_eq;
-mod ser;
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | to_dtype, from_dtype - Converting type `T` from & to `DType`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 pub fn to_dtype<T>(value: T) -> Result<DType>
 where
   T: Serialize,
 {
-  value.serialize(ser::Serializer)
+  value.serialize(ops::ser::Serializer)
 }
 
 pub fn from_dtype<T>(value: DType) -> Result<T>

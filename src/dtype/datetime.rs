@@ -12,15 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! `sage::DType`'s datetime handler.
+//!
+//! By default `sage::DType::DateTime` uses Utc timezone.
+//!
+
+use chrono::prelude::*;
+// Confusing `sage::DateTime` & `chrono::DateTime`.
+use chrono::DateTime as ChronoDateTime;
+
 #[derive(Clone, Debug, Eq, PartialEq)]
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `DateTime`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 pub struct DateTime {
   d: DateTimeImpl,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub enum DateTimeImpl {
-  Date,
-  Time,
-  DateTime,
-}
+// Default timezone is Utc.
+type DateTimeImpl = ChronoDateTime<Utc>;

@@ -12,29 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![allow(clippy::absurd_extreme_comparisons)]
+#![allow(dead_code)]
 
-use std::fmt;
-
+use crate::{Error, Result};
 use serde::{
-  de::{self, Expected, Unexpected, Visitor},
-  forward_to_deserialize_any, Deserialize, Deserializer, Serialize,
+  de::{self, Unexpected, Visitor},
+  forward_to_deserialize_any, serde_if_integer128, Deserialize, Deserializer,
+  Serialize,
 };
+use std::fmt;
 
 #[cfg(feature = "arbitrary_precision")]
 use crate::error::ErrorCode;
-use crate::{Error, Result};
 #[cfg(feature = "arbitrary_precision")]
 use serde::de::{IntoDeserializer, MapAccess};
-
 #[cfg(feature = "arbitrary_precision")]
-pub(crate) const TOKEN: &str = "$sage::private::Number";
+pub(crate) const TOKEN: &str = "$sage::dtype::Number";
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | Number
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 /// Represents a number, whether integer or floating point.
 #[derive(Clone, Eq, PartialEq)]
 pub struct Number {
   /// Number enum implementation.
-  n: NumImpl,
+  pub(crate) n: NumImpl,
 }
 
 /// Number implementation without arbitrary precision.
@@ -55,7 +62,7 @@ impl Eq for NumImpl {}
 
 /// Number representation with arbitrary precision.
 #[cfg(feature = "arbitrary_precision")]
-type NumImpl = String;
+pub type NumImpl = String;
 
 impl Number {
   /// Returns true if the `Number` is an integer between `i64::MIN` & `i64::MAX`.
@@ -63,13 +70,31 @@ impl Number {
   /// For any `Number` on which `is_i64` returns true, `as_i64` is guaranteed to
   /// return the integer value.
   ///
+  /// ```rust
+  /// # use sage::json;
+  /// #
+  /// let big = i64::MAX as u64 + 10;
+  /// let obj = json!({ "a": 65, "b": big, "c": 256.0 });
+  ///
+  /// assert!(obj["a"].is_i64());
+  ///
+  /// // Greater than i64::MAX.
+  /// assert!(!obj["b"].is_i64());
+  ///
+  /// // Numbers with a decimal point are not considered integers.
+  /// assert!(!obj["c"].is_i64());
+  /// ```
   #[inline]
   pub fn is_i64(&self) -> bool {
+    #[cfg(not(feature = "arbitrary_precision"))]
     match self.n {
       NumImpl::PositiveInt(n) => n <= i64::MAX as u64,
       NumImpl::NegativeInt(_) => true,
       NumImpl::Float(_) => false,
     }
+
+    #[cfg(feature = "arbitrary_precision")]
+    self.as_i64().is_some()
   }
 
   /// Returns true if the `Number` is an integer between zero and `u64::MAX`.
@@ -77,9 +102,24 @@ impl Number {
   /// For any `Number` on which `is_u64` returns true, `as_u64` is guaranteed to
   /// return the integer value.
   ///
+  /// ```rust
+  /// # use sage::json;
+  /// #
+  /// let obj = json!({ "a": 65, "b": -65, "c": 256.0 });
+  /// assert!(obj["a"].is_u64());
+  ///
+  /// // Negative integer.
+  /// assert!(!obj["b"].is_u64());
+  ///
+  /// // Numbers with a decimal point are not considered integers.
+  /// assert!(!obj["c"].is_u64());
+  /// ```
   #[inline]
   pub fn is_u64(&self) -> bool {
-    matches!(self.n, NumImpl::PositiveInt(_))
+    #[cfg(not(feature = "arbitrary_precision"))]
+    return matches!(self.n, NumImpl::PositiveInt(_));
+    #[cfg(feature = "arbitrary_precision")]
+    self.as_u64().is_some()
   }
 
   /// Returns true if the `Number` can be represented by `f64`.
@@ -90,17 +130,45 @@ impl Number {
   /// Currently this function returns true if and only if both `is_i64` and
   /// `is_u64` return false but this is not a guarantee in the future.
   ///
+  /// ```rust
+  /// # use sage::json;
+  /// #
+  /// let obj = json!({ "a": 256.0, "b": 65, "c": -65 });
+  /// assert!(obj["a"].is_f64());
+  ///
+  /// // Integers.
+  /// assert!(!obj["b"].is_f64());
+  /// assert!(!obj["c"].is_f64());
+  /// ```
   #[inline]
   pub fn is_f64(&self) -> bool {
-    match self.n {
-      NumImpl::Float(_) => true,
-      NumImpl::PositiveInt(_) | NumImpl::NegativeInt(_) => false,
+    #[cfg(not(feature = "arbitrary_precision"))]
+    return matches!(self.n, NumImpl::Float(_));
+
+    #[cfg(feature = "arbitrary_precision")]
+    {
+      for c in self.n.chars() {
+        if c == '.' || c == 'e' || c == 'E' {
+          return self.n.parse::<f64>().ok().map_or(false, |f| f.is_finite());
+        }
+      }
+      false
     }
   }
 
   /// If the `Number` is an integer, represent it as `i64` if possible. Returns
   /// `None` otherwise.
   ///
+  /// ```rust
+  /// # use sage::json;
+  /// #
+  /// let big = i64::MAX as u64 + 10;
+  /// let obj = json!({ "a": 65, "b": big, "c": 256.0 });
+  ///
+  /// assert_eq!(obj["a"].as_i64(), Some(65));
+  /// assert_eq!(obj["b"].as_i64(), None);
+  /// assert_eq!(obj["c"].as_i64(), None);
+  /// ```
   #[inline]
   pub fn as_i64(&self) -> Option<i64> {
     #[cfg(not(feature = "arbitrary_precision"))]
@@ -123,6 +191,15 @@ impl Number {
   /// If the `Number` is an integer, represent it as `u64` if possible. Returns
   /// `None` otherwise.
   ///
+  /// ```rust
+  /// # use sage::json;
+  /// #
+  /// let obj = json!({ "a": 65, "b": -65, "c": 256.0 });
+  ///
+  /// assert_eq!(obj["a"].as_u64(), Some(65));
+  /// assert_eq!(obj["b"].as_u64(), None);
+  /// assert_eq!(obj["c"].as_u64(), None);
+  /// ```
   #[inline]
   pub fn as_u64(&self) -> Option<u64> {
     #[cfg(not(feature = "arbitrary_precision"))]
@@ -137,6 +214,15 @@ impl Number {
 
   /// Represents the number as `f64` if possible. Returns `None` otherwise.
   ///
+  /// ```rust
+  /// # use sage::json;
+  /// #
+  /// let obj = json!({ "a": 256.0, "b": 65, "c": -65 });
+  ///
+  /// assert_eq!(obj["a"].as_f64(), Some(256.0));
+  /// assert_eq!(obj["b"].as_f64(), Some(65.0));
+  /// assert_eq!(obj["c"].as_f64(), Some(-65.0));
+  /// ```
   #[inline]
   pub fn as_f64(&self) -> Option<f64> {
     #[cfg(not(feature = "arbitrary_precision"))]
@@ -199,7 +285,7 @@ impl fmt::Display for Number {
 
   #[cfg(feature = "arbitrary_precision")]
   fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-    fmt::Display::fmt(self.n, formatter)
+    fmt::Display::fmt(&self.n, formatter)
   }
 }
 
@@ -208,7 +294,7 @@ impl fmt::Debug for Number {
   fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
     let mut debug = formatter.debug_tuple("Number");
     match self.n {
-      NumImpl::PositiveInt(i) => debug.field(&i),
+      NumImpl::PositiveInt(u) => debug.field(&u),
       NumImpl::NegativeInt(i) => debug.field(&i),
       NumImpl::Float(f) => debug.field(&f),
     };
@@ -223,6 +309,14 @@ impl fmt::Debug for Number {
       .finish()
   }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `Serialize` for `Number`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 impl Serialize for Number {
   #[cfg(not(feature = "arbitrary_precision"))]
@@ -246,11 +340,19 @@ impl Serialize for Number {
   {
     use serde::ser::SerializeStruct;
 
-    let mut s = serilizer.serilize_struct(TOKEN, 1)?;
-    s.serilize_field(TOKEN, &self.n)?;
+    let mut s = serializer.serialize_struct(TOKEN, 1)?;
+    s.serialize_field(TOKEN, &self.n)?;
     s.end()
   }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `Deserialize` for `Number`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 impl<'de> Deserialize<'de> for Number {
   #[inline]
@@ -266,6 +368,7 @@ impl<'de> Deserialize<'de> for Number {
       fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.write_str("a JSON number")
       }
+
       #[inline]
       fn visit_i64<E>(self, value: i64) -> Result<Number, E> {
         Ok(value.into())
@@ -291,7 +394,7 @@ impl<'de> Deserialize<'de> for Number {
       where
         V: de::MapAccess<'de>,
       {
-        let value = visitor.next_by_key::<NumberKey>()?;
+        let value = visitor.next_key::<NumberKey>()?;
         if value.is_none() {
           return Err(de::Error::invalid_type(Unexpected::Map, &self));
         }
@@ -303,6 +406,14 @@ impl<'de> Deserialize<'de> for Number {
     deserilizer.deserialize_any(NumberVisitor)
   }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `NumberKey` - feature = "arbitrary_precision".
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 #[cfg(feature = "arbitrary_precision")]
 struct NumberKey;
@@ -327,7 +438,7 @@ impl<'de> de::Deserialize<'de> for NumberKey {
         E: de::Error,
       {
         if s == TOKEN {
-          OK(())
+          Ok(())
         } else {
           Err(de::Error::custom("expected field with custom name"))
         }
@@ -338,6 +449,14 @@ impl<'de> de::Deserialize<'de> for NumberKey {
     Ok(NumberKey)
   }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `NumberFromString` - feature = "arbitrary_precision".
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 #[cfg(feature = "arbitrary_precision")]
 pub struct NumberFromString {
@@ -367,6 +486,7 @@ impl<'de> de::Deserialize<'de> for NumberFromString {
         Ok(NumberFromString { value: n })
       }
     }
+
     deserializer.deserialize_str(Visitor)
   }
 }
@@ -375,6 +495,14 @@ impl<'de> de::Deserialize<'de> for NumberFromString {
 fn invalid_number() -> Error {
   Error::syntax(ErrorCode::InvalidNumber, 0, 0)
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `deserialize_any`, `deserialize_number` macro.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 macro_rules! deserialize_any {
   (@expand [$($num_string:tt)*]) => {
@@ -433,7 +561,7 @@ macro_rules! deserialize_number {
     }
 
     #[cfg(feature = "arbitrary_precision")]
-    fn deserialize<V>(self, visitor: V) -> Result<V::Value, Error>
+    fn $deserialize<V>(self, visitor: V) -> Result<V::Value, Error>
     where
       V: de::Visitor<'de>,
     {
@@ -441,6 +569,14 @@ macro_rules! deserialize_number {
     }
   };
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `Deserializer` for `Number`. - owned
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 impl<'de> Deserializer<'de> for Number {
   type Error = Error;
@@ -458,10 +594,10 @@ impl<'de> Deserializer<'de> for Number {
   deserialize_number!(deserialize_f32 => visit_f32);
   deserialize_number!(deserialize_f64 => visit_f64);
 
-  // serde_if_integer128! {
-  //   deserialize_number!(derizlize_i128 => visit_i128);
-  //   deserialize_number!(derizlize_u128 => visit_u128);
-  // }
+  serde_if_integer128! {
+    deserialize_number!(deserialize_i128 => visit_i128);
+    deserialize_number!(deserialize_u128 => visit_u128);
+  }
 
   forward_to_deserialize_any! {
       bool char str string bytes byte_buf option unit unit_struct
@@ -469,6 +605,14 @@ impl<'de> Deserializer<'de> for Number {
       ignored_any
   }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `Deserializer` for `&Number` - ref.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 impl<'de, 'a> Deserializer<'de> for &'a Number {
   type Error = Error;
@@ -486,10 +630,10 @@ impl<'de, 'a> Deserializer<'de> for &'a Number {
   deserialize_number!(deserialize_f32 => visit_f32);
   deserialize_number!(deserialize_f64 => visit_f64);
 
-  // serde_if_integer128! {
-  //   deserialize_number!(derizlize_i128 => visit_i128);
-  //   deserialize_number!(derizlize_u128 => visit_u128);
-  // }
+  serde_if_integer128! {
+    deserialize_number!(deserialize_i128 => visit_i128);
+    deserialize_number!(deserialize_u128 => visit_u128);
+  }
 
   forward_to_deserialize_any! {
       bool char str string bytes byte_buf option unit unit_struct
@@ -497,6 +641,14 @@ impl<'de, 'a> Deserializer<'de> for &'a Number {
       ignored_any
   }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `NumberDeserializer` - feature = "arbitrary_precision".
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 #[cfg(feature = "arbitrary_precision")]
 pub(crate) struct NumberDeserializer {
@@ -514,25 +666,33 @@ impl<'de> MapAccess<'de> for NumberDeserializer {
     if self.number.is_none() {
       return Ok(None);
     }
-    seed.deserialize(NumberFieldDerializer).map(Some)
+    seed.deserialize(NumberFieldDeserializer).map(Some)
   }
 
   fn next_value_seed<V>(&mut self, seed: V) -> Result<V::Value, Error>
   where
     V: de::DeserializeSeed<'de>,
   {
-    seed.deserialize(self.number.take().unwrap().into_derializer())
+    seed.deserialize(self.number.take().unwrap().into_deserializer())
   }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `NumberFieldDeserializer` - feature = "arbitrary_precision".
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 #[cfg(feature = "arbitrary_precision")]
 struct NumberFieldDeserializer;
 
 #[cfg(feature = "arbitrary_precision")]
-impl<'de> Derializer<'de> for NumberFieldDeserializer {
+impl<'de> Deserializer<'de> for NumberFieldDeserializer {
   type Error = Error;
 
-  fn derialize_any<V>(self, visitor: V) -> Result<V::Value, Error>
+  fn deserialize_any<V>(self, visitor: V) -> Result<V::Value, Error>
   where
     V: de::Visitor<'de>,
   {
@@ -546,90 +706,17 @@ impl<'de> Derializer<'de> for NumberFieldDeserializer {
   }
 }
 
-pub(crate) enum ParserNumber {
-  F64(f64),
-  U64(u64),
-  I64(i64),
-  #[cfg(feature = "arbitrary_precision")]
-  String(String),
-}
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `impl_from_unsigned`, `impl_fromsigned` macros.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
-impl ParserNumber {
-  fn visit<'de, V>(self, visitor: V) -> Result<V::Value>
-  where
-    V: de::Visitor<'de>,
-  {
-    match self {
-      ParserNumber::F64(f) => visitor.visit_f64(f),
-      ParserNumber::U64(u) => visitor.visit_u64(u),
-      ParserNumber::I64(i) => visitor.visit_i64(i),
-      #[cfg(feature = "arbitrary_precision")]
-      ParserNumber::String(s) => {
-        visitor.visit_map(NumberDeserializer { number: s.into() })
-      }
-    }
-  }
-
-  fn invalid_type(self, exp: &dyn Expected) -> Error {
-    match self {
-      ParserNumber::F64(f) => {
-        de::Error::invalid_type(Unexpected::Float(f), exp)
-      }
-      ParserNumber::U64(u) => {
-        de::Error::invalid_type(Unexpected::Unsigned(u), exp)
-      }
-      ParserNumber::I64(i) => {
-        de::Error::invalid_type(Unexpected::Signed(i), exp)
-      }
-      #[cfg(feature = "arbitrary_precision")]
-      ParserNumber::String(_) => {
-        de::Error::invalid_type(Unexpected::Ohter("number"), exp)
-      }
-    }
-  }
-}
-
-impl From<ParserNumber> for Number {
-  fn from(value: ParserNumber) -> Self {
-    let n = match value {
-      ParserNumber::F64(f) => {
-        #[cfg(not(feature = "arbitrary_precision"))]
-        {
-          NumImpl::Float(f)
-        }
-        #[cfg(feature = "arbitrary_precision")]
-        {
-          f.to_string()
-        }
-      }
-      ParserNumber::U64(u) => {
-        #[cfg(not(feature = "arbitrary_precision"))]
-        {
-          NumImpl::PositiveInt(u)
-        }
-        #[cfg(feature = "arbitrary_precision")]
-        {
-          u.to_string()
-        }
-      }
-      ParserNumber::I64(i) => {
-        #[cfg(not(feature = "arbitrary_precision"))]
-        {
-          NumImpl::NegativeInt(i)
-        }
-        #[cfg(feature = "arbitrary_precision")]
-        {
-          i.to_string()
-        }
-      }
-      #[cfg(feature = "arbitrary_precision")]
-      ParserNumber::String(s) => s,
-    };
-
-    Number { n }
-  }
-}
-
+//
+// Implement From trait for Rust integer unsigned types.
+//
 macro_rules! impl_from_unsigned {
   (
     $($ty:ty),*
@@ -652,6 +739,9 @@ macro_rules! impl_from_unsigned {
   };
 }
 
+//
+// Implement From trait for Rust integer signed types.
+//
 macro_rules! impl_from_signed {
   (
     $($ty:ty),*
@@ -661,7 +751,7 @@ macro_rules! impl_from_signed {
         #[inline]
         fn from(i: $ty) -> Self {
           let n = {
-            #[cfg(not(features = "arbitrary_precision"))]
+            #[cfg(not(feature = "arbitrary_precision"))]
             {
               if i < 0 {
                 NumImpl::NegativeInt(i as i64)
@@ -681,6 +771,21 @@ macro_rules! impl_from_signed {
 
 impl_from_unsigned!(u8, u16, u32, u64, usize);
 impl_from_signed!(i8, i16, i32, i64, isize);
+
+#[cfg(feature = "arbitrary_precision")]
+serde_if_integer128! {
+  impl From<i128> for Number {
+    fn from(i: i128) -> Self {
+      Number { n: i.to_string() }
+    }
+  }
+
+  impl From<u128> for Number {
+    fn from(u: u128) -> Self {
+      Number { n: u.to_string() }
+    }
+  }
+}
 
 impl Number {
   #[cfg(not(feature = "arbitrary_precision"))]

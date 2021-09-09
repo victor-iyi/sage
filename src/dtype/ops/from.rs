@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{map::Map, number::Number, DType};
+use crate::dtype::{map::Map, number::Number, DType};
+
 use std::{borrow::Cow, iter::FromIterator};
 
 macro_rules! from_integer {
@@ -268,15 +269,3 @@ impl From<()> for DType {
     DType::Null
   }
 }
-
-// use serde_json::Value;
-
-// impl From<Value> for DType {
-//   fn from(f: Value) -> Self {
-//     match f {
-//       Value::Null => DType::Null,
-//       Value::Array(ref a) => DType::Array(a),
-//       Value::Bool(b) => DType::Boolean(b),
-//     }
-//   }
-// }

@@ -21,25 +21,32 @@
 //! [`IndexMap`]: https://docs.rs/indexmap/*/indexmap/map/struct.IndexMap.html
 
 use super::DType;
-use std::iter::FusedIterator;
-use std::ops;
+use serde::de;
 use std::{
   borrow::Borrow,
-  collections::btree_map::{self, BTreeMap},
   fmt,
   hash::Hash,
-  iter::FromIterator,
+  iter::{FromIterator, FusedIterator},
+  ops,
 };
 
 #[cfg(feature = "preserve_order")]
 use indexmap::{self, IndexMap};
-use serde::de;
+#[cfg(not(feature = "preserve_order"))]
+use std::collections::btree_map::{self, BTreeMap};
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `Map<K, V>`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 /// A key/value type representation.
 pub struct Map<K, V> {
   map: MapImpl<K, V>,
 }
-
 #[cfg(not(feature = "preserve_order"))]
 type MapImpl<K, V> = BTreeMap<K, V>;
 #[cfg(feature = "preserve_order")]
@@ -193,7 +200,7 @@ impl Map<String, DType> {
   #[inline]
   pub fn append(&mut self, other: &mut Self) {
     #[cfg(feature = "preserve_order")]
-    for (k, v) in std::mem::replace(&mut other.map, MapImpl::default()) {
+    for (k, v) in std::mem::take(&mut other.map) {
       self.map.insert(k, v);
     }
     #[cfg(not(feature = "preserve_order"))]
@@ -271,6 +278,14 @@ impl Map<String, DType> {
     }
   }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `Map<String, DType>` trait implementations.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 impl Default for Map<String, DType> {
   #[inline]
@@ -355,7 +370,6 @@ impl fmt::Debug for Map<String, DType> {
   }
 }
 
-#[cfg(any(feature = "std", feature = "alloc"))]
 impl serde::ser::Serialize for Map<String, DType> {
   #[inline]
   fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -370,6 +384,14 @@ impl serde::ser::Serialize for Map<String, DType> {
     map.end()
   }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `serde::de::Deserialize` for `Map<String, DType>`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 impl<'de> de::Deserialize<'de> for Map<String, DType> {
   #[inline]
@@ -394,7 +416,6 @@ impl<'de> de::Deserialize<'de> for Map<String, DType> {
         Ok(Map::new())
       }
 
-      #[cfg(any(feature = "std", feature = "alloc"))]
       #[inline]
       fn visit_map<V>(self, mut visitor: V) -> Result<Self::Value, V::Error>
       where
@@ -413,6 +434,14 @@ impl<'de> de::Deserialize<'de> for Map<String, DType> {
     deserializer.deserialize_map(Visitor)
   }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `FromIterator` & `Extend`  trait implementations.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 impl FromIterator<(String, DType)> for Map<String, DType> {
   fn from_iter<T>(iter: T) -> Self
@@ -434,6 +463,10 @@ impl Extend<(String, DType)> for Map<String, DType> {
   }
 }
 
+///
+/// Implements `Iterator`, `DoubleEndedIterator`, `ExactSizeIterator`
+/// & `FusedIterator` for given item.
+///
 macro_rules! delegate_iterator {
     (($name:ident $($generics:tt)*) => $item:ty) => {
         impl $($generics)* Iterator for $name $($generics)* {
@@ -465,6 +498,14 @@ macro_rules! delegate_iterator {
         impl $($generics)* FusedIterator for $name $($generics)* {}
     }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `Entry`, `VacantEntry` & `OccupiedEntry`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 /// A view into a single entry in a map, which may either be vacant or occupied.
 /// This enum is constructed from the [`entry`] method on [`Map`].
@@ -501,6 +542,14 @@ type VacantEntryImpl<'a> = indexmap::map::VacantEntry<'a, String, DType>;
 type OccupiedEntryImpl<'a> = btree_map::OccupiedEntry<'a, String, DType>;
 #[cfg(feature = "preserve_order")]
 type OccupiedEntryImpl<'a> = indexmap::map::OccupiedEntry<'a, String, DType>;
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | Method implementations for `Entry`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 impl<'a> Entry<'a> {
   /// Returns a reference to this entry's key.
@@ -597,6 +646,14 @@ impl<'a> Entry<'a> {
   }
 }
 
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | Method implementations for `VacantEntry`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
+
 impl<'a> VacantEntry<'a> {
   /// Gets a reference to the key that would be used when inserting a value
   /// through the VacantEntry.
@@ -644,6 +701,14 @@ impl<'a> VacantEntry<'a> {
     self.vacant.insert(value)
   }
 }
+
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | Method implementations for `OccupiedEntry`.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 
 impl<'a> OccupiedEntry<'a> {
   /// Gets a reference to the key in the entry.
@@ -812,6 +877,14 @@ impl<'a> IntoIterator for &'a Map<String, DType> {
   }
 }
 
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `Iter` & `IterMut` - iterator over Map.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
+
 /// An iterator over a `sage::Map`'s entries.
 pub struct Iter<'a> {
   iter: IterImpl<'a>,
@@ -870,6 +943,13 @@ type IntoIterImpl = indexmap::map::IntoIter<String, DType>;
 
 delegate_iterator!((IntoIter) => (String, DType));
 
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `Key` - Map's keys.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
 /// An iterator over a sage::Map's keys.
 pub struct Keys<'a> {
   iter: KeysImpl<'a>,
@@ -882,6 +962,14 @@ type KeysImpl<'a> = indexmap::map::Keys<'a, String, DType>;
 
 delegate_iterator!((Keys<'a>) => &'a String);
 
+/*
+ * +----------------------------------------------------------------------+
+ * | +------------------------------------------------------------------+ |
+ * | | `Values` & `ValuesMut` - Map's values.
+ * | +------------------------------------------------------------------+ |
+ * +----------------------------------------------------------------------+
+*/
+
 /// An iterator over a sage::Map's values.
 pub struct Values<'a> {
   iter: ValuesImpl<'a>,
@@ -893,8 +981,6 @@ type ValuesImpl<'a> = btree_map::Values<'a, String, DType>;
 type ValuesImpl<'a> = indexmap::map::Values<'a, String, DType>;
 
 delegate_iterator!((Values<'a>) => &'a DType);
-
-//////////////////////////////////////////////////////////////////////////////
 
 /// A mutable iterator over a sage::Map's values.
 pub struct ValuesMut<'a> {

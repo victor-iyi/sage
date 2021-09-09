@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::DType;
+use crate::dtype::DType;
 
 #[inline]
 fn eq_i64(value: &DType, other: i64) -> bool {

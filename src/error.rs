@@ -153,7 +153,7 @@ impl Error {
 }
 
 impl Error {
-  // Not public API. Should be pub(crate).
+  // Not public API. Should be `pub(crate)`.
   #[doc(hidden)]
   #[cold]
   pub(crate) fn syntax(code: ErrorCode, line: usize, column: usize) -> Self {
@@ -162,12 +162,9 @@ impl Error {
     }
   }
 
-  // Not public API. Should be pub(crate).
-  //
-  // Update `eager_json` crate when this function changes.
   #[doc(hidden)]
   #[cold]
-  pub fn io(error: io::Error) -> Self {
+  pub(crate) fn io(error: io::Error) -> Self {
     Error {
       err: Box::new(ErrorImpl {
         code: ErrorCode::Io(error),
@@ -177,7 +174,6 @@ impl Error {
     }
   }
 
-  // Not public API. Should be pub(crate).
   #[doc(hidden)]
   #[cold]
   pub(crate) fn fix_position<F>(self, f: F) -> Self

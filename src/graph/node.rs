@@ -19,8 +19,8 @@ use std::str::FromStr;
 
 use regex::Regex;
 
+use crate::dtype::{DType, URI};
 use crate::error::{Error, ErrorCode};
-use crate::types::{DType, URI};
 
 /*
  * +----------------------------------------------------------------------+
@@ -64,7 +64,7 @@ impl Node {
   ///
   /// ```rust
   /// # use sage::graph::Node;
-  /// # use sage::types::URI;
+  /// # use sage::dtype::URI;
   /// #
   /// let node_type = Node::Blank;
   /// assert_eq!(node_type.is_blank(), true);
@@ -81,7 +81,7 @@ impl Node {
   ///
   /// ```rust
   /// # use sage::graph::Node;
-  /// # use sage::types::URI;
+  /// # use sage::dtype::URI;
   /// #
   /// let node_type = Node::Schema;
   /// assert_eq!(node_type.is_schema(), true);
@@ -97,7 +97,7 @@ impl Node {
   ///
   /// ```rust
   /// # use sage::graph::Node;
-  /// # use sage::types::URI;
+  /// # use sage::dtype::URI;
   /// #
   /// let node_type = Node::Http(URI::from("https://schema.org/Person"));
   /// assert_eq!(node_type.is_http(), true);
@@ -114,7 +114,7 @@ impl Node {
   ///
   /// ```rust
   /// # use sage::graph::Node;
-  /// # use sage::types::DType;
+  /// # use sage::DType;
   /// #
   /// let node_type = Node::Literal(DType::String("John Doe".to_string()));
   /// assert_eq!(node_type.is_literal(), true);
@@ -131,7 +131,7 @@ impl Node {
   ///
   /// ```rust
   /// # use sage::graph::Node;
-  /// # use sage::types::DType;
+  /// # use sage::dtype::DType;
   /// #
   /// let john : Node = Node::Literal(DType::String("John Doe".to_string()));
   /// assert_eq!(john.get_type(), &john);

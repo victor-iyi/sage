@@ -28,7 +28,7 @@ use serde::{
 use std::{borrow::Cow, fmt, str::FromStr};
 
 #[cfg(feature = "arbitrary_precision")]
-use super::number::NumberFromString;
+use crate::dtype::number::NumberFromString;
 
 impl<'de> Deserialize<'de> for DType {
   #[inline]

@@ -18,15 +18,22 @@
 //!
 //! [Knowledge Graph]: https://en.wikipedia.org/wiki/Knowledge_Graph
 
-mod datastore;
+#![allow(
+  clippy::absurd_extreme_comparisons,
+  clippy::zero_prefixed_literal,
+  clippy::should_implement_trait,
+  clippy::needless_doctest_main
+)]
+
 pub mod error;
 pub mod graph;
 #[macro_use]
 mod macros;
+mod datastore;
+pub mod dtype;
 mod processor;
 mod query;
 pub mod schema;
-pub mod types;
 pub mod vocab;
 
 /// Sage `Result` type.
@@ -38,13 +45,19 @@ pub type SageResult<T, E = error::Error> = Result<T, E>;
 /// Sage `Error` type.
 pub type SageError = Error;
 
-/// Re-exports important traits and types. Meant to be glob imported when using Sage.
+/// Re-exports important traits and types.
+/// Meant to be glob imported when using Sage.
 pub mod prelude {
   // Sage Error handler functionalities.
   pub use crate::error::*;
 
-  // Sage types & vocabularies.
-  pub use crate::types::*;
+  // Sage datastore.
+  pub use crate::datastore::json;
+
+  // Sage types.
+  pub use crate::dtype::*;
+
+  // Sage vocabularies.
   pub use crate::vocab::*;
 
   // Sage graphs, nodes, connections, predicates & triples.
@@ -52,10 +65,11 @@ pub mod prelude {
 
   // Sage schemas. Files and data sage can work with.
   // Example: jsonld, rdf, wikidata, etc.
-  pub use crate::schema::*;
+  pub use crate::schema;
 
   // Export macros.
   pub use crate::macros::*;
 }
 
+// Expose `sage::prelude` by default.
 pub use prelude::*;

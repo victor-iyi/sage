@@ -17,6 +17,9 @@ use std::fmt;
 use crate::{to_dtype, DType, Error, ErrorCode, Map, Number, Result};
 use serde::ser::{Impossible, Serialize};
 
+#[cfg(feature = "arbitrary_precision")]
+use serde::serde_if_integer128;
+
 impl Serialize for DType {
   #[inline]
   fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -52,7 +55,7 @@ impl Serialize for DType {
 ///
 /// The `to_dtype` function is implementable as:
 ///
-/// ```
+/// ```rust,ignore
 /// use serde::Serialize;
 /// use sage::{Error, DType};
 ///
@@ -60,7 +63,7 @@ impl Serialize for DType {
 /// where
 ///     T: Serialize,
 /// {
-///     input.serialize(sage::Serializer)
+///     input.serialize(sage::json::Serializer)
 /// }
 /// ```
 pub struct Serializer;

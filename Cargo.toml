@@ -23,9 +23,10 @@ dotenv = "0.15"
 ryu = "1.0.5"
 log = "0.4"
 ntriple = "0.1.1"
-regex = "1.3.1"
+regex = "1.5"
 rdf = "0.1.4"
 rand = "0.8"
+chrono = { version = "0.4" }
 itoa = { version = "0.4", default-features = false }
 serde = { version = "1.0", default-features = false }
 serde_json = { version = "1.0" }
@@ -38,8 +39,6 @@ members = [
 ]
 
 [features]
-std = ["serde/std"]
-
 # Use an arbitrary precision number representation for sage::Number.
 # This allows sage numbers of arbitrary size/precision to be read into
 # a Number and written back to a string without loss of precision.
@@ -49,6 +48,9 @@ arbitrary_precision = []
 # This allows data to be read into `DType` and written back to a string
 # while preserving the order of map keys in the input.
 preserve_order = ["indexmap"]
+
+# Provide a `RawDType` type that can hold unprocessed JSON during deserialization.
+raw_dtype = []
 
 [badges]
 appveyor = { repository = "victor-iyi/sage", service = "github" }
