@@ -16,7 +16,9 @@ mod de;
 mod from;
 mod index;
 mod partial_eq;
-pub mod ser;
+mod ser;
+
+// Re-export modules
 
 pub use ser::{
   SerializeMap, SerializeStructVariant, SerializeTupleVariant, SerializeVec,

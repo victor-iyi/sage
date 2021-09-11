@@ -15,8 +15,8 @@
 use std::fmt;
 
 use crate::{to_dtype, DType, Error, ErrorCode, Map, Number, Result};
-use serde::ser::{Impossible, Serialize};
 
+use serde::ser::{Impossible, Serialize};
 #[cfg(feature = "arbitrary_precision")]
 use serde::serde_if_integer128;
 

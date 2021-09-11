@@ -14,13 +14,14 @@
 
 #![allow(dead_code)]
 
-use std::fmt;
-use std::str::FromStr;
+use std::{fmt, str::FromStr};
 
 use regex::Regex;
 
-use crate::dtype::{DType, URI};
-use crate::error::{Error, ErrorCode};
+use crate::{
+  dtype::{DType, URI},
+  error::{Error, ErrorCode},
+};
 
 /*
  * +----------------------------------------------------------------------+
@@ -53,9 +54,14 @@ pub enum Node {
   Http(URI),
 
   /// `Literal` node is used to represent nodes with primitive types
-  /// like `Strings`, `Numbers`, `Date`, `Time`, `DateTime` etc.
-  /// which contains no extra data associated to this node.
+  /// supported by `sage::DType`. For example: `Numbers`, `String`, `Array`,
+  /// `Object`, `Boolean`, `DateTime` & `Null`.
+  ///
+  /// For example [James Cameron] - [directed] -> [Avatar, Titanic, Terminator].
   Literal(DType),
+
+  /// `Multiple` node is created from
+  Multiple(Vec<Node>),
 }
 
 /// Implementation for `Node` enum.
@@ -63,14 +69,13 @@ impl Node {
   /// Check of `Node` is of type `Node::Blank`.
   ///
   /// ```rust
-  /// # use sage::graph::Node;
-  /// # use sage::dtype::URI;
+  /// # use sage::{dtype::URI, graph::Node};
   /// #
   /// let node_type = Node::Blank;
-  /// assert_eq!(node_type.is_blank(), true);
+  /// assert!(node_type.is_blank());
   ///
-  /// # assert_eq!(Node::Schema.is_blank(), false);
-  /// # assert_eq!(Node::Http(URI::from("https://schema.org/Person")).is_blank(), false);
+  /// # assert!(!Node::Schema.is_blank());
+  /// # assert!(!Node::Http(URI::from("https://schema.org/Person")).is_blank());
   /// ```
   ///
   pub fn is_blank(&self) -> bool {
@@ -80,13 +85,13 @@ impl Node {
   /// Check if `Node` is of type `Node::Schema`.
   ///
   /// ```rust
-  /// # use sage::graph::Node;
-  /// # use sage::dtype::URI;
+  /// # use sage::{dtype::URI, graph::Node};
   /// #
   /// let node_type = Node::Schema;
-  /// assert_eq!(node_type.is_schema(), true);
+  /// assert!(node_type.is_schema());
+  ///
   /// #
-  /// # assert_eq!(Node::Http(URI::from("https://schema.org/Person")).is_schema(), false);
+  /// # assert!(!Node::Http(URI::from("https://schema.org/Person")).is_schema());
   /// ```
   ///
   pub fn is_schema(&self) -> bool {
@@ -96,14 +101,13 @@ impl Node {
   /// Check if `Node` is of type `Node::Http`.
   ///
   /// ```rust
-  /// # use sage::graph::Node;
-  /// # use sage::dtype::URI;
+  /// # use sage::{dtype::URI, graph::Node};
   /// #
   /// let node_type = Node::Http(URI::from("https://schema.org/Person"));
-  /// assert_eq!(node_type.is_http(), true);
+  /// assert!(node_type.is_http());
   /// #
-  /// # assert_eq!(Node::Blank.is_http(), false);
-  /// # assert_eq!(Node::Schema.is_http(), false);
+  /// # assert!(!Node::Blank.is_http());
+  /// # assert!(!Node::Schema.is_http());
   /// ```
   ///
   pub fn is_http(&self) -> bool {
@@ -113,18 +117,36 @@ impl Node {
   /// Check if `Node` is of type `Node::Literal`.
   ///
   /// ```rust
-  /// # use sage::graph::Node;
-  /// # use sage::DType;
+  /// # use sage::{dtype::DType, graph::Node};
   /// #
   /// let node_type = Node::Literal(DType::String("John Doe".to_string()));
-  /// assert_eq!(node_type.is_literal(), true);
+  /// assert!(node_type.is_literal());
+  ///
   /// #
-  /// # assert_eq!(Node::Blank.is_literal(), false);
-  /// # assert_eq!(Node::Schema.is_literal(), false);
+  /// # assert!(!Node::Blank.is_literal());
+  /// # assert!(!Node::Schema.is_literal());
   /// ```
   ///
   pub fn is_literal(&self) -> bool {
     matches!(*self, Node::Literal(_))
+  }
+
+  /// Check if `Node` is of type `Node::Multiple`.
+  ///
+  /// ```rust
+  /// # use sage::graph::Node;
+  ///
+  /// let node_type = Node::Multiple(vec![
+  ///   Node::Literal("Rust".into()),
+  ///   Node::Literal("Java".into()),
+  ///   Node::Literal("Python".into()),
+  /// ]);
+  ///
+  /// assert!(node_type.is_multiple());
+  /// ```
+  ///
+  pub fn is_multiple(&self) -> bool {
+    matches!(*self, Node::Multiple(_))
   }
 
   /// Returns the `Node` variant.

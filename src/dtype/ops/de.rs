@@ -15,7 +15,11 @@
 //! Deserializer for `DType`.
 //!
 
+#[cfg(feature = "arbitrary_precision")]
+use crate::dtype::number::NumberFromString;
 use crate::{DType, DateTime, Error, Map, Number};
+
+use std::{borrow::Cow, fmt, str::FromStr};
 
 use serde::{
   de::{
@@ -24,11 +28,6 @@ use serde::{
   },
   forward_to_deserialize_any, serde_if_integer128,
 };
-
-use std::{borrow::Cow, fmt, str::FromStr};
-
-#[cfg(feature = "arbitrary_precision")]
-use crate::dtype::number::NumberFromString;
 
 /*
  * +----------------------------------------------------------------------+

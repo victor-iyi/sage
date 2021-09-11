@@ -14,12 +14,14 @@
 
 #![allow(dead_code)]
 
-use regex::Regex;
-use std::fmt;
-use std::str::FromStr;
+use std::{fmt, str::FromStr};
 
-use crate::error::{Error, ErrorCode};
-use crate::graph::*;
+use crate::{
+  error::{Error, ErrorCode},
+  graph::*,
+};
+
+use regex::Regex;
 
 /*
  * +----------------------------------------------------------------------+
