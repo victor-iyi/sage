@@ -747,57 +747,101 @@ impl Default for DType {
  * +----------------------------------------------------------------------+
 */
 
+/// Convert a `T` into `sage::DType` which represents any valid JSON data.
+///
+/// # Examples
+///
+/// ```rust
+/// use serde_derive::Serialize;
+/// use sage::{json, Result};
+///
+/// #[derive(Serialize)]
+/// struct User {
+///   fingerprint: String,
+///   location: String,
+/// }
+///
+/// fn compare_json_dtype() -> Result<()> {
+///   let u = User {
+///     fingerprint: "0xF9BA143B95FF60D82".to_owned(),
+///     location: "Menlon Park, CA".to_owned(),
+///   };
+///
+///   // The type of `expected` is `sage::DType`.
+///   let expected = json!({
+///     "fingerprint": "0xF9BA143B95FF60D82",
+///     "location": "Menlon Park, CA",
+///   });
+///
+///   let obj = sage::to_dtype(u).unwrap();
+///   assert_eq!(obj, expected);
+///
+///   Ok(())
+/// }
+///
+/// # compare_json_dtype().unwrap();
+/// ```
+///
+/// # Errors
+///
+/// This conversion can fila if `T`'s implementation of `Serialize` decides to
+/// fail, or if `T` contains a map with non-string keys.
+///
+/// ```rust,ignore
+/// use std::collections::BTreeMap;
+///
+/// fn main() {
+///   // The keys in this map are vectors, not strings.
+///   let mut map = BTreeMap::new();
+///   map.insert(vec![32, 64], "x86");
+///
+///   println!("{}", sage::to_value(map).unwrap());
+/// }
+/// ```
 pub fn to_dtype<T>(value: T) -> Result<DType>
 where
   T: Serialize,
 {
-  value.serialize(ops::ser::Serializer)
+  value.serialize(Serializer)
 }
 
+/// Interpret a `sage::DType` as an instance of type `T`.
+///
+/// # Example
+///
+/// ```rust
+/// use serde_derive::Deserialize;
+/// use sage::json;
+///
+/// #[derive(Deserialize, Debug)]
+/// struct User {
+///   fingerprint: String,
+///   location: String,
+/// }
+///
+/// fn main() {
+///   // The type of `j` is `sage::DType`.
+///   let j = json!({
+///     "fingerprint": "0xF9BA143B95FF60D82",
+///     "location": "Menlon Park, CA",
+///   });
+///
+///   let u: User = sage::from_dtype(j).unwrap();
+///   println!("{:#?}", u);
+/// }
+/// ```
+///
+/// # Errors
+///
+/// This conversion can fail if the structure of the `DType` does not match the
+/// structure expected by `T`, for example if `T` is a struct type but the `DTye`.
+/// contains something other than a JSON map. It can also fail if the structure
+/// is correct but `T` is implementation of `Deserialize` decides that something
+/// is wrong with the data, for example required struct field are missing from
+/// the JOSN map or some number is too big to fit in the expected primitive type.
 pub fn from_dtype<T>(value: DType) -> Result<T>
 where
   T: DeserializeOwned,
 {
   T::deserialize(value)
 }
-
-/*
-/// The basic data types such as Integers, Strings, etc.
-const DataType: IRI = prefix + "DataType";
-/// Boolean: True or False.
-const Boolean: IRI = prefix + "Boolean";
-/// The boolean value true.
-const True: IRI = prefix + "True";
-/// The boolean value false.
-const False: IRI = prefix + "False";
-/// Data type: Text.
-const Text: IRI = prefix + "Text";
-/// Data type: URL.
-const URL: IRI = prefix + "URL";
-/// Data type: Number.
-const Number: IRI = prefix + "Number";
-/// Data type: Integer.
-const Integer: IRI = prefix + "Integer";
-/// Data type: Floating number.
-const Float: IRI = prefix + "Float";
-/// A date value in ISO 8601 date format.
-const Date: IRI = prefix + "Date";
-/// A point in time recurring on multiple days in the
-/// form hh:mm:ss[Z|(+|-)hh:mm].
-const Time: IRI = prefix + "Time";
-/// A combination of date and time of day in the form
-/// [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] (see Chapter 5.4 of ISO 8601).
-const DateTime: IRI = prefix + "DateTime";
-
-
-/// A class, also often called a 'Type'; equivalent to rdfs:Class.
-const Class: IRI = prefix + "Class";
-/// A property, used to indicate attributes and relationships
-/// of some Thing; equivalent to rdf:Property.
-const Property: IRI = prefix + "Property";
-
-/// The name of the item.
-const Name: IRI = prefix + "name";
-/// The URL of the item property.
-const UrlProp: IRI = prefix + "url";
-*/

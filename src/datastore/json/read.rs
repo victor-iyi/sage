@@ -14,14 +14,12 @@
 
 #![allow(non_upper_case_globals)]
 
-use crate::{Error, ErrorCode, Result};
+#[cfg(feature = "raw_dtype")]
+use super::raw::{BorrowedRawDeserializer, OwnedRawDeserializer};
+use crate::{json::iter::LineColIterator, Error, ErrorCode, Result};
 
 use std::{cmp, io, ops::Deref, str};
 
-use super::iter::LineColIterator;
-
-#[cfg(feature = "raw_dtype")]
-use super::raw::{BorrowedRawDeserializer, OwnedRawDeserializer};
 #[cfg(feature = "raw_dtype")]
 use serde::de::Visitor;
 

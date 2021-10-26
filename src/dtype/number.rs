@@ -14,16 +14,17 @@
 
 #![allow(dead_code)]
 
-use crate::{Error, Result};
+use std::fmt;
+
 use serde::{
   de::{self, Unexpected, Visitor},
   forward_to_deserialize_any, serde_if_integer128, Deserialize, Deserializer,
   Serialize,
 };
-use std::fmt;
 
 #[cfg(feature = "arbitrary_precision")]
 use crate::error::ErrorCode;
+use crate::{Error, Result};
 #[cfg(feature = "arbitrary_precision")]
 use serde::de::{IntoDeserializer, MapAccess};
 #[cfg(feature = "arbitrary_precision")]

@@ -16,17 +16,17 @@
 
 #[cfg(feature = "float_roundtrip")]
 use std::iter;
-
 use std::{io, iter::FusedIterator, marker::PhantomData, str::FromStr};
 
-use crate::{Error, ErrorCode, Result};
-
-use super::read::{self, Fused, Read, Reference};
 #[cfg(not(feature = "arbitrary_precision"))]
 use crate::dtype::number::NumImpl;
 #[cfg(feature = "arbitrary_precision")]
 use crate::dtype::number::NumberDeserializer;
-use crate::{dtype::number::Number, tri};
+use crate::{
+  dtype::number::Number,
+  json::{read, Fused, Read, Reference},
+  tri, Error, ErrorCode, Result,
+};
 
 use serde::{
   de::{self, Expected, Unexpected},

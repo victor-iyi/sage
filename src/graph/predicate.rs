@@ -14,13 +14,14 @@
 
 #![allow(dead_code)]
 
-use std::fmt;
-use std::str::FromStr;
+use std::{fmt, str::FromStr};
+
+use crate::{
+  error::{Error, ErrorCode},
+  vocab::Namespace,
+};
 
 use regex::Regex;
-
-use crate::error::{Error, ErrorCode};
-use crate::vocab::Namespace;
 
 /// Predicate is the actual data contained when two `Node`s are connected through some `ConnectionType`.
 pub trait Pred<T> {}

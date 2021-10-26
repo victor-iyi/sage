@@ -1,6 +1,6 @@
 [package]
 name = "sage"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Victor I. Afolabi <javafolabi@gmail.com>"]
 edition = "2018"
 description = "Sage is an open source Knowledge Graph used to represent linked-data."
@@ -34,10 +34,10 @@ indexmap = { version = "1.7", optional = true }
 
 [dev-dependencies]
 log = "0.4"
-serde = "*"
-serde_bytes = "*"
-serde_stacker = "*"
-serde_derive = "*"
+serde = "1.0"
+serde_bytes = "0.11"
+serde_stacker = "0.1.4"
+serde_derive = "1.0"
 
 [workspace]
 members = [

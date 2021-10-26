@@ -33,6 +33,10 @@ image:
 # See <https://github.com/rust-lang-nursery/rustup.rs/#toolchain-specification>
 # for description of toolchains and host triples.
 environment:
+  global:
+    # This will be used as part of the zipfile name.
+    PROJECT_NAME: sage
+
   matrix:
 
   # MSVC Toolchains
@@ -93,3 +97,34 @@ build: false
 # automatically be placed in the `PATH` environment variable.
 test_script:
   - cargo test --verbose --workspace --all-features
+
+before_deploy:
+  # Generate artifacts for release.
+  - cargo build --release --workspace --all-features
+  - mkdir -p staging
+  - copy target/release/sage.exe staging
+  - cd staging
+  # Release zipfile will look like this: 'sage-v1.2.3-x86_64-pc-windows-msvc'
+  - 7z a ../%PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%target%.zip *
+  - appveyor PushArtifact %PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%target%.zip
+
+deploy:
+  release: sage-v%APPVEYOR_BUILD_VERSION%
+  description: 'Windows release'
+  # All the zipped artifacts will be deployed.
+  artifact: /.*\.zip/
+  # TODO: Regenerate this auth_token for your project, this one won't work for you. Here's how:
+  # - Go to  'https://github.com/settings/tokens/new' and generate a Token with only the
+  # `public_repo` scope enabled.
+  # - Then go to 'https://ci.appveyor.com/tools/encrypt' and enter the newly generated token.
+  # - Copy the encrypted token and paste it here.
+  auth_token:
+    secure: Rnc9Fe+hxzJJiNUi0QpNm0euZC1y+6D3+RBmxzSmuauETzXYuD8paauAxvHYWeGm
+  provider: GitHub
+  # Deploy when a new tag is pushed and only on the stable channel.
+  on:
+    # Channel to use to produce the release artifacts.
+    # NOTE: Make sure you only release *once* per tag.
+    channel: stable
+    branch: master
+    APPVEYOR_REPO_TAG: true
