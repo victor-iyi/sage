@@ -17,5 +17,5 @@ name = "sage-cli"
 path = "src/main.rs"
 
 [dependencies]
-clap = "2.33"
+clap = { version = "4.1.4", features = ["derive"] }
 sage = { path = "../../sage" }
