@@ -1,6 +1,6 @@
 [package]
 name = "sage"
-version = "0.3.1"
+version = "0.4.0"
 authors = ["Victor I. Afolabi <javafolabi@gmail.com>"]
 edition = "2021"
 description = "Sage is an open source Knowledge Graph used to represent linked-data."
