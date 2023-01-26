@@ -61,7 +61,7 @@ Add this to your `[dependencies]` section in your `Cargo.toml` file.
 
 ```toml
 [dependencies]
-sage = "0.3"
+sage = "0.4"
 ```
 
 ## Other Language Support
