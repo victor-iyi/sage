@@ -2,7 +2,7 @@
 name = "sage"
 version = "0.3.1"
 authors = ["Victor I. Afolabi <javafolabi@gmail.com>"]
-edition = "2018"
+edition = "2021"
 description = "Sage is an open source Knowledge Graph used to represent linked-data."
 readme = "README.md"
 homepage = "https://github.io/victor-iyi/sage"
