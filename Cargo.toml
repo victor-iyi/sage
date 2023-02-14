@@ -24,13 +24,13 @@ ntriple = "0.1.1"
 regex = "1.5"
 rdf = "0.1.4"
 rand = "0.8"
-chrono = { version = "0.4" }
 itoa = { version = "0.4", default-features = false }
 serde = { version = "1.0", default-features = false }
 serde_json = { version = "1.0" }
 uuid = { version = "0.8", features = ["serde", "v4"] }
 indexmap = { version = "1.7", optional = true }
 dotenvy = "0.15.6"
+chrono = { version = "0.4.23", default-features = false, features = ["time"] }
 
 [dev-dependencies]
 log = "0.4"
