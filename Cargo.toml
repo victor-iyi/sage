@@ -7,7 +7,7 @@ description = "Sage is an open source Knowledge Graph used to represent linked-d
 readme = "README.md"
 homepage = "https://github.io/victor-iyi/sage"
 repository = "https://github.com/victor-iyi/sage"
-license = "Apache-2.0"
+license = "MIT OR Apache-2.0"
 keywords = ["sage", "knowledge-graph", "linked-data"]
 categories = ["data-structures", "science", "text-processing"]
 exclude = ["/resources"]
@@ -79,5 +79,6 @@ raw_dtype = []
 unbounded_depth = []
 
 [badges]
+maintenance = { status = "experimental" }
 appveyor = { repository = "victor-iyi/sage", service = "github" }
 travis-ci = { repository = "victor-iyi/sage" }
