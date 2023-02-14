@@ -19,7 +19,6 @@ name = "sage"
 path = "src/lib.rs"
 
 [dependencies]
-dotenv = "0.15"
 ryu = "1.0.5"
 ntriple = "0.1.1"
 regex = "1.5"
@@ -31,6 +30,7 @@ serde = { version = "1.0", default-features = false }
 serde_json = { version = "1.0" }
 uuid = { version = "0.8", features = ["serde", "v4"] }
 indexmap = { version = "1.7", optional = true }
+dotenvy = "0.15.6"
 
 [dev-dependencies]
 log = "0.4"
