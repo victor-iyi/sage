@@ -7,7 +7,7 @@ description = "Sage is an open source Knowledge Graph used to represent linked-d
 readme = "README.md"
 homepage = "https://github.io/victor-iyi/sage"
 repository = "https://github.com/victor-iyi/sage"
-license = "Apache-2.0"
+license = "MIT OR Apache-2.0"
 keywords = ["sage", "knowledge-graph", "linked-data"]
 categories = ["data-structures", "science", "text-processing"]
 exclude = ["/resources"]
@@ -19,18 +19,18 @@ name = "sage"
 path = "src/lib.rs"
 
 [dependencies]
-dotenv = "0.15"
 ryu = "1.0.5"
 ntriple = "0.1.1"
 regex = "1.5"
 rdf = "0.1.4"
 rand = "0.8"
-chrono = { version = "0.4" }
 itoa = { version = "0.4", default-features = false }
 serde = { version = "1.0", default-features = false }
 serde_json = { version = "1.0" }
 uuid = { version = "0.8", features = ["serde", "v4"] }
 indexmap = { version = "1.7", optional = true }
+dotenvy = "0.15.6"
+chrono = { version = "0.4.23", default-features = false, features = ["time"] }
 
 [dev-dependencies]
 log = "0.4"
@@ -79,5 +79,6 @@ raw_dtype = []
 unbounded_depth = []
 
 [badges]
+maintenance = { status = "experimental" }
 appveyor = { repository = "victor-iyi/sage", service = "github" }
 travis-ci = { repository = "victor-iyi/sage" }
