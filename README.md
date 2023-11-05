@@ -16,8 +16,8 @@
 
 # Sage
 
-Sage is an open source [Knowledge Graph] used to represent linked-data.
-It comprises of varieties of features that makes it stand out amongst other
+Sage is an open source [Knowledge Graph] used to represent linked data.
+It comprises a variety of features that make it stand out amongst other
 (open source) Knowledge Graphs.
 
 [Knowledge Graph]: https://en.wikipedia.org/wiki/Knowledge_Graph
@@ -49,9 +49,9 @@ It comprises of varieties of features that makes it stand out amongst other
   - Graph embedding
 
 - **Bonus**
-  - Written in Rust *(lightening fast)*
+  - Written in Rust *(lightning fast)*
   - Community driven
-  - Multi threaded / non-blocking
+  - Multi-threaded / non-blocking
   - Support for Python [`sage-py`] - for Machine Learning tasks
   - Support for JavaScript [`sage-js`] for Web Assembly &amp; Mobile integration
 
@@ -66,7 +66,7 @@ sage = "0.4"
 
 ## Other Language Support
 
-Other supporting projects that extends the functionality of sage to other programming
+Other supporting projects that extend the functionality of sage to other programming
 languages.
 
 - [ ] [`sage-py`] - Python bindings for Natural Language Processing.
@@ -85,7 +85,7 @@ You are very welcome to modify and use them in your own projects.
 Please keep a link to the [original repository](https://github.com/victor-iyi/sage).
 If you have made a fork with substantial modifications that you feel may be useful,
 then please [open a new issue on GitHub](https://github.com/victor-iyi/sage/issues)
-with a link and short description.
+with a link and a short description.
 
 ## License (Apache)
 
